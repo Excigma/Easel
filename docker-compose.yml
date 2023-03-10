@@ -1,0 +1,30 @@
+services:
+  easel_postgres:
+    container_name: easel_postgres
+    image: postgres:15
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DATABASE=postgres
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  easel_discord:
+    container_name: easel_discord
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: on-failure:5
+    depends_on:
+      - 'easel_postgres'
+
+volumes:
+  pg_data:

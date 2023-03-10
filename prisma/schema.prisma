@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["orderByNulls"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Channel {
+  id          String   @id @unique
+  lastChecked DateTime?
+
+  canvasCalendar    CanvasCalendar? @relation(fields: [canvasCalendarUrl], references: [userId])
+  canvasFeeds       CanvasFeed[]
+  panoptoFolders    PanoptoFolder[]
+  canvasCalendarUrl String?
+}
+
+model User {
+  id String @id @unique
+
+  canvasCalendar CanvasCalendar?
+  canvasFeeds    CanvasFeed[]
+  panoptoFolders PanoptoFolder[]
+}
+
+model CanvasFeed {
+  name String
+  url  String @id @unique
+
+  broadcasts Broadcast[]
+
+  User   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  Channel Channel[]
+}
+
+model CanvasCalendar {
+  url String @unique
+
+  broadcasts Broadcast[]
+
+  User   User   @relation(fields: [userId], references: [id])
+  userId String @id @unique
+
+  Channel Channel[]
+}
+
+model PanoptoFolder {
+  name String
+  url  String @id @unique
+
+  broadcasts Broadcast[]
+
+  User   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  Channel Channel[]
+}
+
+model Broadcast {
+  url String
+  lastUpdate String
+
+  channelId String
+  messageId String
+
+  CanvasCalendar   CanvasCalendar? @relation(fields: [canvasCalendarId], references: [userId])
+  canvasCalendarId String?
+  CanvasFeed       CanvasFeed?     @relation(fields: [canvasFeedId], references: [url])
+  canvasFeedId     String?
+  PanoptoFolder    PanoptoFolder?  @relation(fields: [panoptoFolderId], references: [url])
+  panoptoFolderId  String?
+
+  @@unique([channelId, messageId])
+}

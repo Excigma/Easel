@@ -1,0 +1,46 @@
+{
+  "name": "easel",
+  "version": "1.0.0",
+  "description": "Easel is a Discord Bot created to interact with Canvas and Panopto, acting as a bridge between Discord and University of Auckland hosted services to help students stay on top of content and deadlines.",
+  "main": "src/index.js",
+  "repository": "https://github.com/Excigma/Easel.git",
+  "author": "@excigma",
+  "license": "MIT",
+  "packageManager": "yarn@3.4.1",
+  "devDependencies": {
+    "@sapphire/prettier-config": "^1.4.5",
+    "standard": "^17.0.0"
+  },
+  "dependencies": {
+    "@discordjs/builders": "^1.4.0",
+    "@extractus/feed-extractor": "^6.2.1",
+    "@prisma/client": "^4.10.1",
+    "@sapphire/decorators": "^6.0.0",
+    "@sapphire/discord-utilities": "^3.0.0",
+    "@sapphire/discord.js-utilities": "^6.0.2",
+    "@sapphire/fetch": "^2.4.1",
+    "@sapphire/framework": "^4.1.1",
+    "@sapphire/plugin-hmr": "^2.0.0",
+    "@sapphire/plugin-logger": "^3.0.1",
+    "@sapphire/plugin-subcommands": "^4.0.0",
+    "@sapphire/stopwatch": "^1.5.0",
+    "@sapphire/time-utilities": "^1.7.8",
+    "@sapphire/utilities": "^3.11.0",
+    "bufferutil": "^4.0.7",
+    "discord-api-types": "^0.37.35",
+    "discord.js": "^14.7.1",
+    "dotenv": "^16.0.3",
+    "erlpack": "^0.1.4",
+    "html-entities": "^2.3.3",
+    "node-cron": "^3.0.2",
+    "node-ical": "^0.15.3",
+    "prisma": "^4.10.1",
+    "turndown": "^7.1.1",
+    "zlib-sync": "^0.1.8"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node src/index.js",
+    "lint": "standard"
+  }
+}
