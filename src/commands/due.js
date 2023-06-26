@@ -80,7 +80,7 @@ class DueCommand extends Command {
           })
       })
 
-      const PLACEHOLDER_TEXT = "__**IMPORTANT:\n\nThe times are off by 13 hours, deadlines are due 13 hours BEFORE the time shown.**__\nI'll fix this later\n\n"
+      const PLACEHOLDER_TEXT = "__**IMPORTANT:\n\nThe times are off by 13 hours, deadlines are due 13 hours BEFORE or AFTER the time shown.**__\nI'll fix this later\n\n"
       // const PLACEHOLDER_TEXT = ''
       let page = PLACEHOLDER_TEXT
 
