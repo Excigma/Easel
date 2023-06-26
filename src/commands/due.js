@@ -25,6 +25,9 @@ class DueCommand extends Command {
     })
   }
 
+  /**
+   * @param {import('discord.js').Interaction} interaction
+   */
   async chatInputRun (interaction) {
     try {
       // Check if the user has their canvasICalendar relational field set
@@ -70,12 +73,12 @@ class DueCommand extends Command {
         template: new EmbedBuilder()
           .setColor(0x2694D7)
           .setAuthor({
-            name: interaction.user.tag,
-            iconURL: interaction.user.avatarURL()
+            name: interaction.user.username,
+            iconURL: interaction.user.displayAvatarURL()
           })
           .setTitle('Due Dates')
           .setFooter({
-            iconURL: this.container.client.user.avatarURL(),
+            iconURL: this.container.client.user.displayAvatarURL(),
             text: 'Please do not solely rely on this to keep track of due dates.'
           })
       })

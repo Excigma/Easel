@@ -22,19 +22,20 @@ class FeedCheck {
     container.logger.info('FeedCheck: Running')
 
     // Fetch the channel that was checked the longest time ago
-    const channel = (await prisma.channel.findMany({
-      orderBy: {
-        lastChecked: { sort: 'asc', nulls: 'first' }
-      },
-      include: {
-        canvasFeeds: {
-          include: {
-            broadcasts: true
-          }
-        }
-      },
-      take: 1
-    }))?.[0]
+    // const channel = (await prisma.channel.findMany({
+    //   orderBy: {
+    //     lastChecked: { sort: 'asc', nulls: 'first' }
+    //   },
+    //   include: {
+    //     canvasFeeds: {
+    //       include: {
+    //         broadcasts: true
+    //       }
+    //     }
+    //   },
+    //   take: 1
+    // }))?.[0]
+    const channel = null
 
     if (!channel) {
       return container.logger.info('FeedCheck: No channels found')
