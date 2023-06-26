@@ -2,11 +2,11 @@ const { RegisterBehavior } = require('@sapphire/framework')
 const { Subcommand } = require('@sapphire/plugin-subcommands')
 const { strInfo, strSuccess } = require('../lib/utils')
 
-class SubscribeCommand extends Subcommand {
+class ExecuteCommand extends Subcommand {
   constructor (context, options) {
     super(context, {
       ...options,
-      name: 'execute',
+      name: 'c',
       description: 'Developer only. Executes hardcoded code for use in development (mostly to unregister/edit commands).',
       preconditions: ['DeveloperOnly']
     })
@@ -33,4 +33,4 @@ class SubscribeCommand extends Subcommand {
   }
 }
 
-module.exports = { SubscribeCommand }
+module.exports = { ExecuteCommand }
