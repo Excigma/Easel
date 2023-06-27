@@ -1,10 +1,10 @@
 services:
   easel_postgres:
     container_name: easel_postgres
-    image: postgres:15
+    image: postgres:15-alpine
     restart: always
     ports:
-      - 5432:5432
+      - '5432:5432'
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -12,10 +12,23 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      test: pg_isready -U postgres
       interval: 10s
       timeout: 5s
       retries: 5
+
+  easel_redis:
+    container_name: easel_redis
+    image: redis:alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: redis-cli ping | grep PONG
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 
   easel_discord:
     container_name: easel_discord
@@ -25,6 +38,7 @@ services:
     restart: on-failure:5
     depends_on:
       - 'easel_postgres'
+      - 'easel_redis'
 
 volumes:
   pg_data:
