@@ -8,12 +8,6 @@ node_modules
 !.yarn/sdks
 !.yarn/versions
 
-# Diagnostic reports (https://nodejs.org/api/report.html)
-report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
-
-# TypeScript cache
-*.tsbuildinfo
-
 # Runtime data
 pids
 *.pid
@@ -36,7 +30,3 @@ data
 dist/
 data/
 scripts/
-
-# Caches
-.tmp
-.cache
