@@ -27,6 +27,8 @@ model Broadcast {
   url        String
   lastUpdate String
 
+  courseId String
+
   channelId String
   messageId String
 

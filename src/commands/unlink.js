@@ -12,10 +12,6 @@ class UnlinkCommand extends Subcommand {
       description: 'Unlink various services the University of Auckland uses to Easel',
       subcommands: [
         {
-          name: 'announcements',
-          chatInputRun: 'chatInputAnnouncements'
-        },
-        {
           name: 'calendar',
           chatInputRun: 'chatInputCalendar'
         },
@@ -37,17 +33,6 @@ class UnlinkCommand extends Subcommand {
       .setDescription(this.description)
       .addSubcommand(command =>
         command
-          .setName('announcements')
-          .setDescription("Unlink a Canvas course's announcement feeds from Easel")
-          .addStringOption(option =>
-            option
-              .setName('name')
-              .setDescription("Name of Canvas course's announcement feed")
-              .setRequired(true)
-          )
-      )
-      .addSubcommand(command =>
-        command
           .setName('calendar')
           .setDescription('Unlink your Canvas calendar from Easel')
       )
@@ -55,21 +40,15 @@ class UnlinkCommand extends Subcommand {
         command
           .setName('all')
           .setDescription('Unlink all accounts from Easel')
-      ), {
+      )
+      .addSubcommand(command =>
+        command
+          .setName('panopto')
+          .setDescription('Unlink your Panopto account from Easel')
+      ),
+    {
       idHints: ['1065170308950147092'],
       behaviorWhenNotIdentical: RegisterBehavior.Overwrite
-    })
-    // .addSubcommand(command =>
-    //   command
-    //     .setName('panopto')
-    //     .setDescription('Unlink your Panopto account from Easel')
-    // )
-  }
-
-  async chatInputAnnouncements (interaction) {
-    return await interaction.reply({
-      content: strInfo('This command is still under construction 🚧'),
-      ephemeral: true
     })
   }
 
@@ -138,9 +117,6 @@ class UnlinkCommand extends Subcommand {
             delete: true
           },
           panoptoFolders: {
-            deleteMany: {}
-          },
-          canvasFeeds: {
             deleteMany: {}
           }
         }
