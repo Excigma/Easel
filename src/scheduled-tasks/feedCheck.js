@@ -1,25 +1,28 @@
-// TODO: Extend Piece
-// const { Piece } = require('@sapphire/framework')
-const { container } = require('@sapphire/framework')
-const { PermissionFlagsBits } = require('discord.js')
-const { prisma } = require('../prisma')
-const { fetchFeed, formatFeed } = require('../serviceAdapters/feed')
+import { PermissionFlagsBits } from 'discord.js'
+const { Time } = require('@sapphire/time-utilities')
 
-class FeedCheck {
+const { prisma } = require('../lib/prisma')
+
+const { ScheduledTask } = require('@sapphire/plugin-scheduled-tasks')
+const { fetchFeed, formatFeed } = require('../lib/serviceAdapters/feed')
+
+export class FeedCheckTask extends ScheduledTask {
+  /**
+   * @param {ScheduledTask.Context} context
+   * @param {ScheduledTask.Options} options
+   */
   constructor (context, options) {
-    // super(context, {
-    //   ...options,
-    //   name: 'feedCheck'
-    // })
-
-    this.cronjobs = [
-      // Once every 5 minutes
-      '0 */1 * * * *'
-    ]
+    super(context, {
+      ...options,
+      interval: Time.Minute * 5
+    })
   }
 
+  /**
+   * This task splits the job into smaller chunks chunks to be done within the interval.
+   */
   async run () {
-    container.logger.info('FeedCheck: Running')
+    this.container.logger.info('FeedCheck: Running')
 
     // Fetch the channel that was checked the longest time ago
     // const channel = (await prisma.channel.findMany({
@@ -38,7 +41,7 @@ class FeedCheck {
     const channel = null
 
     if (!channel) {
-      return container.logger.info('FeedCheck: No channels found')
+      return this.container.logger.info('FeedCheck: No channels found')
     }
 
     // We are checking for stuff on this channel
@@ -51,7 +54,7 @@ class FeedCheck {
       }
     })
 
-    container.logger.info(channel.id)
+    this.container.logger.info(channel.id)
 
     // TODO: Check if other channels are also subscribed to the same feeds
     // Note: This code is of poor quality and was written a day before semester starts
@@ -91,10 +94,10 @@ class FeedCheck {
         const messageContent = `**${messageContentHeader}** <t:${Date.parse(announcement.updated || announcement.published) / 1000}:R>: ${announcement.title || ''} (<${announcement.link}>)\n*This __won't__ be updated if the announcement is edited; I will try send a new message but this is not guaranteed. Check Canvas for the most up to date content.*`
 
         try {
-          const guildChannel = await container.client.channels.fetch(channel.id)
+          const guildChannel = await this.container.client.channels.fetch(channel.id)
 
-          if (!guildChannel.permissionsFor(container.client.user.id).has([PermissionFlagsBits.SendMessages, PermissionFlagsBits.EmbedLinks])) {
-            return container.logger.info(`FeedCheck: Missing permissions to send messages in channel ${channel.id}`)
+          if (!guildChannel.permissionsFor(this.container.client.user.id).has([PermissionFlagsBits.SendMessages, PermissionFlagsBits.EmbedLinks])) {
+            return this.container.logger.info(`FeedCheck: Missing permissions to send messages in channel ${channel.id}`)
           }
 
           const message = await guildChannel.send({
@@ -125,8 +128,8 @@ class FeedCheck {
             }
           })
         } catch (error) {
-          container.logger.error(`FeedCheck: Error while sending message to channel ${channel.id}`)
-          container.logger.error(error)
+          this.container.logger.error(`FeedCheck: Error while sending message to channel ${channel.id}`)
+          this.container.logger.error(error)
         }
       }
     }
@@ -134,5 +137,3 @@ class FeedCheck {
     // TODO: Update the channel's updatedAt field
   }
 }
-
-module.exports = { FeedCheck }
