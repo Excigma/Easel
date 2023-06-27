@@ -1,6 +1,8 @@
 require('@sapphire/plugin-hmr/register')
 require('@sapphire/plugin-logger/register')
+require('@sapphire/plugin-subcommands/register')
 require('@sapphire/plugin-utilities-store/register')
+require('@sapphire/plugin-scheduled-tasks/register')
 
 require('dotenv').config()
 
@@ -40,6 +42,15 @@ const client = new SapphireClient({
   },
   allowedMentions: {
     parse: ['users', 'roles']
+  },
+  tasks: {
+    bull: {
+      connection: {
+        port: process.env.REDIS_PORT,
+        password: process.env.REDIS_PASSWORD,
+        host: process.env.REDIS_HOST
+      }
+    }
   }
 })
 
