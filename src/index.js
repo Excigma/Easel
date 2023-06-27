@@ -1,5 +1,7 @@
 require('@sapphire/plugin-hmr/register')
 require('@sapphire/plugin-logger/register')
+require('@sapphire/plugin-utilities-store/register')
+
 require('dotenv').config()
 
 const { BucketScope, LogLevel, SapphireClient } = require('@sapphire/framework')

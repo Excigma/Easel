@@ -23,6 +23,7 @@
     "@sapphire/plugin-hmr": "^2.0.1",
     "@sapphire/plugin-logger": "^3.0.4",
     "@sapphire/plugin-subcommands": "^4.0.1",
+    "@sapphire/plugin-utilities-store": "^1.0.1",
     "@sapphire/stopwatch": "^1.5.0",
     "@sapphire/time-utilities": "^1.7.9",
     "@sapphire/utilities": "^3.12.0",

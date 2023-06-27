@@ -379,6 +379,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@sapphire/plugin-utilities-store@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "@sapphire/plugin-utilities-store@npm:1.0.1"
+  dependencies:
+    tslib: ^2.5.0
+  checksum: c5dfde454a49f34279accfc7f882e63c5458d529991e573d0b1fb2f4f32532c8160032c225bd78151f7a8df58c4ad08d6b1a903175d8794f5621be53f3aadbea
+  languageName: node
+  linkType: hard
+
 "@sapphire/prettier-config@npm:^1.4.5":
   version: 1.4.5
   resolution: "@sapphire/prettier-config@npm:1.4.5"
@@ -1095,6 +1104,7 @@ __metadata:
     "@sapphire/plugin-hmr": ^2.0.1
     "@sapphire/plugin-logger": ^3.0.4
     "@sapphire/plugin-subcommands": ^4.0.1
+    "@sapphire/plugin-utilities-store": ^1.0.1
     "@sapphire/prettier-config": ^1.4.5
     "@sapphire/stopwatch": ^1.5.0
     "@sapphire/time-utilities": ^1.7.9
