@@ -15,15 +15,7 @@ COPY prisma /usr/app/prisma
 RUN yarn workspaces focus --production --all
 RUN yarn prisma generate
 
-# Switch to Distroless Docker image for production images
-FROM node:18 as production
-
-WORKDIR /usr/app
-ENV NODE_ENV production
-ENV DATABASE_URL=postgres://postgres:postgres@easel_postgres/postgres
-
-COPY --from=install-dependencies /usr/app /usr/app
-COPY .env /usr/app
+COPY .env courses.json /usr/app
 COPY prisma /usr/app/prisma
 COPY src /usr/app/src
 
