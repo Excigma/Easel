@@ -29,7 +29,6 @@ services:
       timeout: 5s
       retries: 5
 
-
   easel_discord:
     container_name: easel_discord
     build:

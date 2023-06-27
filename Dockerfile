@@ -1,6 +1,4 @@
-# This build stage installs dependencies used in production
-# Two stages use this as a base - this should be cached
-FROM node:18 AS install-dependencies
+FROM node:18
 
 WORKDIR /usr/app
 ENV NODE_ENV production

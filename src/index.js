@@ -10,7 +10,7 @@ const { BucketScope, LogLevel, SapphireClient } = require('@sapphire/framework')
 const { ActivityType, Partials, GatewayIntentBits } = require('discord.js')
 const sapphireOverrides = require('./lib/sapphireOverrides')
 
-const production = process.env.NODE_ENV === 'PRODUCTION'
+const production = process.env.NODE_ENV === 'production'
 
 const client = new SapphireClient({
   caseInsensitiveCommands: true,
@@ -46,8 +46,9 @@ const client = new SapphireClient({
   tasks: {
     bull: {
       connection: {
+        host: process.env.REDIS_HOST,
         port: process.env.REDIS_PORT,
-        host: process.env.REDIS_HOST
+        password: process.env.REDIS_PASSWORD
       }
     }
   }
