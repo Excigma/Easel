@@ -9,6 +9,7 @@
   "packageManager": "yarn@3.4.1",
   "devDependencies": {
     "@sapphire/prettier-config": "^1.4.5",
+    "bun-types": "^0.6.10",
     "standard": "^17.1.0"
   },
   "dependencies": {

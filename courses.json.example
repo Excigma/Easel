@@ -1,8 +1,8 @@
 {
-	"<course name>": {
-		"<owner discord user id>": "<rss feel url>"
-	},
-	"ELECTENG/COMPSYS 209: Analogue and Digital Design": {
-		"193483293489237487": "https://example.instructure.com/feeds/announcements/enrollment_dEnfSjw4FjsW6FjsTjqMzo4sSjwGhhsWrNfdGh5s.atom"
-	}
+  "<course name>": {
+    "<owner discord user id>": "<rss feel url>"
+  },
+  "ELECTENG/COMPSYS 209: Analogue and Digital Design": {
+    "193483293489237487": "https://example.instructure.com/feeds/announcements/enrollment_dEnfSjw4FjsW6FjsTjqMzo4sSjwGhhsWrNfdGh5s.atom"
+  }
 }
