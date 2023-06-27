@@ -1,4 +1,4 @@
-import { PermissionFlagsBits } from 'discord.js'
+const { PermissionFlagsBits } = require('discord.js')
 const { Time } = require('@sapphire/time-utilities')
 
 const { prisma } = require('../lib/prisma')
@@ -6,7 +6,7 @@ const { prisma } = require('../lib/prisma')
 const { ScheduledTask } = require('@sapphire/plugin-scheduled-tasks')
 const { fetchFeed, formatFeed } = require('../lib/serviceAdapters/feed')
 
-export class FeedCheckTask extends ScheduledTask {
+class FeedCheckTask extends ScheduledTask {
   /**
    * @param {ScheduledTask.Context} context
    * @param {ScheduledTask.Options} options
@@ -137,3 +137,5 @@ export class FeedCheckTask extends ScheduledTask {
     // TODO: Update the channel's updatedAt field
   }
 }
+
+module.exports = { FeedCheckTask }
