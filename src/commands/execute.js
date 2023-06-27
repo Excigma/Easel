@@ -3,6 +3,10 @@ const { Subcommand } = require('@sapphire/plugin-subcommands')
 const { strInfo, strSuccess } = require('../lib/utils')
 
 class ExecuteCommand extends Subcommand {
+  /**
+   * @param {import('@sapphire/framework').Command.Context} context
+   * @param {import('@sapphire/framework').Command.Options} options
+   */
   constructor (context, options) {
     super(context, {
       ...options,
@@ -12,6 +16,7 @@ class ExecuteCommand extends Subcommand {
     })
   }
 
+  /** @param {import('@sapphire/framework').ApplicationCommandRegistry} registry */
   registerApplicationCommands (registry) {
     registry.registerChatInputCommand(builder => builder
       .setName(this.name)
@@ -21,6 +26,7 @@ class ExecuteCommand extends Subcommand {
     })
   }
 
+  /** @param {import('discord.js').Interaction} interaction */
   async chatInputRun (interaction) {
     await interaction.reply({
       content: strInfo('Executing code...'),

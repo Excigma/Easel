@@ -8,6 +8,10 @@ const { EmbedBuilder } = require('discord.js')
 const { DATABASE_ACCESS_ERROR } = require('../lib/consts')
 
 class DueCommand extends Command {
+  /**
+   * @param {import('@sapphire/framework').Command.Context} context
+   * @param {import('@sapphire/framework').Command.Options} options
+   */
   constructor (context, options) {
     super(context, {
       ...options,
@@ -16,6 +20,7 @@ class DueCommand extends Command {
     })
   }
 
+  /** @param {import('@sapphire/framework').ApplicationCommandRegistry} registry */
   registerApplicationCommands (registry) {
     registry.registerChatInputCommand(builder => builder
       .setName(this.name)
@@ -25,9 +30,7 @@ class DueCommand extends Command {
     })
   }
 
-  /**
-   * @param {import('discord.js').Interaction} interaction
-   */
+  /** @param {import('discord.js').Interaction} interaction */
   async chatInputRun (interaction) {
     try {
       // Check if the user has their canvasICalendar relational field set

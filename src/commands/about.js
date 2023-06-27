@@ -1,6 +1,10 @@
 const { Command, RegisterBehavior } = require('@sapphire/framework')
 
 class AboutCommand extends Command {
+  /**
+   * @param {import('@sapphire/framework').Command.Context} context
+   * @param {import('@sapphire/framework').Command.Options} options
+   */
   constructor (context, options) {
     super(context, {
       ...options,
@@ -9,6 +13,7 @@ class AboutCommand extends Command {
     })
   }
 
+  /** @param {import('@sapphire/framework').ApplicationCommandRegistry} registry */
   registerApplicationCommands (registry) {
     registry.registerChatInputCommand(builder => builder
       .setName(this.name)
@@ -19,6 +24,7 @@ class AboutCommand extends Command {
     })
   }
 
+  /** @param {import('discord.js').Interaction} interaction */
   async chatInputRun (interaction) {
     const about = [
       "Easel is a Discord bot that provides a bridge between the University of Auckland's Canvas LMS and Discord.",

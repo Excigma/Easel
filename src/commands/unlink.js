@@ -5,6 +5,10 @@ const { DATABASE_STORE_SUCCESSFUL, DATABASE_ACCESS_ERROR } = require('../lib/con
 const { strWarn, strInfo, strError } = require('../lib/utils')
 
 class UnlinkCommand extends Subcommand {
+  /**
+   * @param {import('@sapphire/framework').Subcommand.Context} context
+   * @param {import('@sapphire/framework').Subcommand.Options} options
+   */
   constructor (context, options) {
     super(context, {
       ...options,
@@ -27,6 +31,7 @@ class UnlinkCommand extends Subcommand {
     })
   }
 
+  /** @param {import('@sapphire/framework').ApplicationCommandRegistry} registry */
   registerApplicationCommands (registry) {
     registry.registerChatInputCommand(builder => builder
       .setName(this.name)
@@ -52,6 +57,7 @@ class UnlinkCommand extends Subcommand {
     })
   }
 
+  /** @param {import('discord.js').Interaction} interaction */
   async chatInputCalendar (interaction) {
     await interaction.deferReply({ ephemeral: true })
 
@@ -84,6 +90,7 @@ class UnlinkCommand extends Subcommand {
     })
   }
 
+  /** @param {import('discord.js').Interaction} interaction */
   async chatInputPanopto (interaction) {
     return await interaction.reply({
       content: strInfo('This subcommand is still under construction 🚧'),
@@ -91,6 +98,7 @@ class UnlinkCommand extends Subcommand {
     })
   }
 
+  /** @param {import('discord.js').Interaction} interaction */
   async chatInputAll (interaction) {
     await interaction.deferReply({ ephemeral: true })
 

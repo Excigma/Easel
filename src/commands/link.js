@@ -9,6 +9,10 @@ const LINK_SUCCESSFUL = 'Cool. The service has been linked to Easel successfully
 
 // TODO: De-duplicate code if possible
 class LinkCommand extends Subcommand {
+  /**
+   * @param {import('@sapphire/framework').Subcommand.Context} context
+   * @param {import('@sapphire/framework').Subcommand.Options} options
+   */
   constructor (context, options) {
     super(context, {
       ...options,
@@ -27,6 +31,7 @@ class LinkCommand extends Subcommand {
     })
   }
 
+  /** @param {import('@sapphire/framework').ApplicationCommandRegistry} registry */
   registerApplicationCommands (registry) {
     registry.registerChatInputCommand(builder => builder
       .setName(this.name)
@@ -53,6 +58,7 @@ class LinkCommand extends Subcommand {
     })
   }
 
+  /** @param {import('discord.js').Interaction} interaction */
   async chatInputCalendar (interaction) {
     const url = interaction.options.getString('url')
 
@@ -106,6 +112,7 @@ class LinkCommand extends Subcommand {
     }
   }
 
+  /** @param {import('discord.js').Interaction} interaction */
   async chatInputPanopto (interaction) {
     return await interaction.reply({
       content: strInfo('This subcommand is still under construction 🚧'),
@@ -113,6 +120,7 @@ class LinkCommand extends Subcommand {
     })
   }
 
+  /** @param {import('discord.js').Interaction} interaction */
   async canvasCalendarInstructions (interaction) {
     const instructions = [
       '**Disclaimer:**',
