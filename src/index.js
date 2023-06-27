@@ -1,12 +1,12 @@
-require('@sapphire/plugin-hmr/register');
-require('@sapphire/plugin-logger/register');
-require('dotenv').config();
+require('@sapphire/plugin-hmr/register')
+require('@sapphire/plugin-logger/register')
+require('dotenv').config()
 
-const { BucketScope, LogLevel, SapphireClient } = require('@sapphire/framework');
-const { ActivityType, Partials, GatewayIntentBits } = require('discord.js');
-const sapphireOverrides = require('./lib/sapphireOverrides');
+const { BucketScope, LogLevel, SapphireClient } = require('@sapphire/framework')
+const { ActivityType, Partials, GatewayIntentBits } = require('discord.js')
+const sapphireOverrides = require('./lib/sapphireOverrides')
 
-const production = process.env.NODE_ENV === 'PRODUCTION';
+const production = process.env.NODE_ENV === 'PRODUCTION'
 
 const client = new SapphireClient({
   caseInsensitiveCommands: true,
@@ -39,8 +39,8 @@ const client = new SapphireClient({
   allowedMentions: {
     parse: ['users', 'roles']
   }
-});
+})
 
-sapphireOverrides();
+sapphireOverrides()
 
 client.login(process.env.DISCORD_TOKEN)
