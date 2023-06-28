@@ -4,7 +4,7 @@ const { strError, strWarn } = require('../lib/utils')
 const { fetchCalendar, formatCalendar } = require('../lib/serviceAdapters/calendar')
 const { PaginatedMessage } = require('@sapphire/discord.js-utilities')
 
-const { EmbedBuilder } = require('discord.js')
+const { EmbedBuilder, PermissionFlagsBits } = require('discord.js')
 const { DATABASE_ACCESS_ERROR } = require('../lib/consts')
 
 class DueCommand extends Command {
@@ -17,7 +17,7 @@ class DueCommand extends Command {
       ...options,
       name: 'due',
       description: 'Check upcoming deadlines that are set on Canvas',
-      requiredClientPermissions: ['EMBED_LINKS']
+      requiredClientPermissions: [PermissionFlagsBits.EmbedLinks]
     })
   }
 
