@@ -32,19 +32,19 @@ class FeedCheckTask extends ScheduledTask {
         const announcements = formatFeed(await fetchFeed(feed.rssUrl))
 
         for (const announcement of announcements) {
-          // Search Prisma for a broadcast with the same url and channelId
-          const previousPosts = await prisma.broadcast.findMany({
-            where: {
-              url: announcement.link,
-              courseId
-            }
-          })
-
           for (const channel of feed.channels) {
-            const previousPost = previousPosts.find(broadcast => (broadcast.url === announcement.link) && (broadcast.channelId === channel))
+            // Search Prisma for a broadcast with the same url and channelId
+            const previousPosts = await prisma.broadcast.findMany({
+              where: {
+                url: announcement.link,
+                channelId: channel,
+                courseId
+              }
+            })
 
             // Check if the announcement has already been posted
-            if (previousPost && previousPost.lastUpdate === (announcement.updated || announcement.published).toString()) continue
+            const updateTime = (announcement.updated || announcement.published).toString()
+            if (previousPosts.length && previousPosts.some(post => post.lastUpdate === updateTime)) continue
 
             try {
               const guildChannel = await this.container.client.channels.fetch(channel)
@@ -54,8 +54,13 @@ class FeedCheckTask extends ScheduledTask {
               }
 
               // TODO: Fetch and reply to the last sent announcement if it exists
-              const message = await guildChannel.send(this.generateMessage(announcement, previousPost))
-              await prisma.broadcast.upsert(this.generateUpset(courseId, message, announcement, channel))
+              const newMessage = await guildChannel.send(this.generateMessage(announcement, previousPosts))
+              await prisma.broadcast.upsert(this.generateUpset(courseId, newMessage, announcement, channel))
+
+              for (const post of previousPosts) {
+                const previousMessage = await guildChannel.messages.fetch(post.messageId)
+                await previousMessage.edit(this.generateEditMessage(newMessage, previousMessage))
+              }
             } catch (error) {
               this.container.logger.error(`FeedCheck: Error while sending message to channel ${channel.id}`)
               this.container.logger.error(error)
@@ -66,7 +71,7 @@ class FeedCheckTask extends ScheduledTask {
     }
   }
 
-  generateMessage (announcement, previousPost) {
+  generateMessage (announcement, previousPosts) {
     const embed = {
       title: announcement.title,
       url: announcement.link,
@@ -85,16 +90,30 @@ class FeedCheckTask extends ScheduledTask {
       embed.timestamp = announcement.updated || announcement.published
     }
 
-    const messageContentHeader =
-      previousPost
-        ? '⚠️ A previous announcement was updated'
-        : 'A new announcement was posted to Canvas'
+    const messageContentHeader = previousPosts.length
+      ? '⚠️ A previous announcement was updated'
+      : 'A new announcement was posted to Canvas'
 
     const messageContent = `**${messageContentHeader}** <t:${Date.parse(announcement.updated || announcement.published) / 1000}:R>: ${announcement.title || ''} (<${announcement.link}>)\n*This __won't__ be updated if the announcement is edited; I will try send a new message but this is not guaranteed. Check Canvas for the most up to date content.*`
 
     return {
       content: messageContent,
       embeds: [embed]
+    }
+  }
+
+  generateEditMessage (newMessage, previousMessage) {
+    let newContent = `🛑 There is a more updated version of this announcement below:\n${newMessage.url}\n\n`
+
+    if (!previousMessage.content.includes('🛑')) {
+      newContent += '🛑 The content of this announcement is now __outdated__.\n'
+    }
+
+    newContent += previousMessage.content
+
+    return {
+      content: newContent,
+      embeds: previousMessage.embeds
     }
   }
 
