@@ -72,7 +72,7 @@ class FeedCheckTask extends ScheduledTask {
                 await previousMessage.edit(this.generateEditMessage(newMessage, previousMessage))
               }
             } catch (error) {
-              this.container.logger.error(`FeedCheck: Error while sending message to channel ${channel.id}`)
+              this.container.logger.error(`FeedCheck: Error while sending message to channel ${channel}`)
               this.container.logger.error(error)
             }
           }
