@@ -13,7 +13,7 @@ COPY prisma /usr/app/prisma
 RUN yarn workspaces focus --production --all
 RUN yarn prisma generate
 
-COPY .env courses.json /usr/app
+COPY .env feeds.json /usr/app
 COPY prisma /usr/app/prisma
 COPY src /usr/app/src
 
