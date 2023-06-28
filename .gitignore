@@ -23,7 +23,7 @@ yarn-error.log*
 
 # Application secrets
 .env
-courses.json
+feeds.json
 data
 
 # Build output
