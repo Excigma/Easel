@@ -16,7 +16,8 @@ class DueCommand extends Command {
     super(context, {
       ...options,
       name: 'due',
-      description: 'Check upcoming deadlines that are set on Canvas'
+      description: 'Check upcoming deadlines that are set on Canvas',
+      requiredClientPermissions: ['EMBED_LINKS']
     })
   }
 
