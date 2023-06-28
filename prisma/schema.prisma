@@ -24,6 +24,8 @@ model CanvasCalendar {
 }
 
 model Broadcast {
+  createdAt DateTime @default(now())
+
   url  String
   hash String
 

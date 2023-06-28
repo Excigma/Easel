@@ -42,6 +42,9 @@ class FeedCheckTask extends ScheduledTask {
                 url: announcement.link,
                 channelId: channel,
                 courseId
+              },
+              orderBy: {
+                createdAt: 'desc'
               }
             })
 
@@ -55,8 +58,17 @@ class FeedCheckTask extends ScheduledTask {
                 return this.container.logger.info(`FeedCheck: Missing permissions to send messages in channel ${channel.id}`)
               }
 
-              // TODO: Fetch and reply to the last sent announcement if it exists
-              const newMessage = await guildChannel.send(this.generateMessage(announcement, previousPosts))
+              let newMessage
+              const messageContent = this.generateMessage(announcement, previousPosts)
+
+              if (previousPosts.length) {
+                // Reply to the previous message if there is a previous message
+                const previousMessage = await guildChannel.messages.fetch(previousPosts[0].messageId)
+                newMessage = await previousMessage.reply(messageContent)
+              } else {
+                newMessage = await guildChannel.send(messageContent)
+              }
+
               await prisma.broadcast.create({
                 data: {
                   url: announcement.link,
