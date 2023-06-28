@@ -1,5 +1,6 @@
 const { PermissionFlagsBits } = require('discord.js')
 const { Time } = require('@sapphire/time-utilities')
+const { xxh32 } = require('@node-rs/xxhash')
 
 const { prisma } = require('../lib/prisma')
 
@@ -32,6 +33,8 @@ class FeedCheckTask extends ScheduledTask {
         const announcements = formatFeed(await fetchFeed(feed.rssUrl))
 
         for (const announcement of announcements) {
+          const hash = xxh32(announcement.content).toString(16)
+
           for (const channel of feed.channels) {
             // Search Prisma for a broadcast with the same url and channelId
             const previousPosts = await prisma.broadcast.findMany({
@@ -43,8 +46,7 @@ class FeedCheckTask extends ScheduledTask {
             })
 
             // Check if the announcement has already been posted
-            const updateTime = (announcement.updated || announcement.published).toString()
-            if (previousPosts.length && previousPosts.some(post => post.lastUpdate === updateTime)) continue
+            if (previousPosts.length && previousPosts.some(post => post.hash === hash)) continue
 
             try {
               const guildChannel = await this.container.client.channels.fetch(channel)
@@ -55,7 +57,15 @@ class FeedCheckTask extends ScheduledTask {
 
               // TODO: Fetch and reply to the last sent announcement if it exists
               const newMessage = await guildChannel.send(this.generateMessage(announcement, previousPosts))
-              await prisma.broadcast.upsert(this.generateUpset(courseId, newMessage, announcement, channel))
+              await prisma.broadcast.create({
+                data: {
+                  url: announcement.link,
+                  channelId: channel,
+                  messageId: newMessage.id,
+                  courseId,
+                  hash
+                }
+              })
 
               for (const post of previousPosts) {
                 const previousMessage = await guildChannel.messages.fetch(post.messageId)
@@ -114,27 +124,6 @@ class FeedCheckTask extends ScheduledTask {
     return {
       content: newContent,
       embeds: previousMessage.embeds
-    }
-  }
-
-  generateUpset (courseId, message, announcement, channel) {
-    return {
-      where: {
-        channelId_messageId: {
-          channelId: channel.id,
-          messageId: message.id
-        }
-      },
-      create: {
-        url: announcement.link,
-        channelId: channel.id,
-        messageId: message.id,
-        courseId,
-        lastUpdate: (announcement.updated ?? announcement.published).toString()
-      },
-      update: {
-        lastUpdate: (announcement.updated ?? announcement.published).toString()
-      }
     }
   }
 }

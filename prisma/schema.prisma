@@ -24,8 +24,8 @@ model CanvasCalendar {
 }
 
 model Broadcast {
-  url        String
-  lastUpdate String
+  url  String
+  hash String
 
   courseId String
 
