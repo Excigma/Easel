@@ -3,9 +3,6 @@ FROM node:18
 WORKDIR /usr/app
 ENV NODE_ENV production
 
-# Run process as a new non-privileged user
-USER node
-
 # Copy package.json and yarn cache into container and install dependencies for transpilation
 COPY package.json yarn.lock .yarnrc.yml /usr/app
 COPY .yarn /usr/app/.yarn
@@ -16,5 +13,8 @@ RUN yarn prisma generate
 
 COPY .env feeds.json /usr/app
 COPY src /usr/app/src
+
+# Run process as a new non-privileged user
+USER node
 
 CMD ["node", "src/index.js"]
