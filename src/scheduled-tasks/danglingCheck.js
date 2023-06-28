@@ -1,5 +1,4 @@
 const { Time } = require('@sapphire/time-utilities')
-const { prisma } = require('../lib/prisma')
 const { ScheduledTask } = require('@sapphire/plugin-scheduled-tasks')
 
 class DanglingCheckTask extends ScheduledTask {
