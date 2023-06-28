@@ -6,7 +6,7 @@
   "repository": "https://github.com/Excigma/Easel.git",
   "author": "@excigma",
   "license": "MIT",
-  "packageManager": "yarn@3.4.1",
+  "packageManager": "yarn@3.6.0",
   "devDependencies": {
     "@sapphire/prettier-config": "^1.4.5",
     "standard": "^17.1.0"
