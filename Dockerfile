@@ -40,7 +40,7 @@ FROM install-dependencies AS build-environment
 RUN yarn add tsup && rm -rf "$(yarn cache clean)"
 
 # Copy Typescript transpile configuration and source into container
-COPY tsconfig.json tsup.config.ts feeds.json /usr/app
+COPY tsconfig.json tsup.config.ts feeds.ts /usr/app
 COPY src /usr/app/src
 
 # Transpile Typescript - this will not be cached

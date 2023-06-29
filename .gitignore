@@ -23,7 +23,7 @@ yarn-error.log*
 
 # Application secrets
 .env
-feeds.json
+feeds.ts
 data
 
 # Build output

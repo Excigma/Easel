@@ -6,7 +6,7 @@ import { ScheduledTask } from '@sapphire/plugin-scheduled-tasks'
 import { fetchFeed, formatFeed } from '../lib/serviceAdapters/feed'
 import { ApplyOptions } from '@sapphire/decorators'
 
-import courses from '../../feeds.json' assert { type: 'json' }
+import courses from '../../feeds'
 
 @ApplyOptions<ScheduledTask.Options>({ interval: Time.Minute * 5 })
 class FeedCheckTask extends ScheduledTask {

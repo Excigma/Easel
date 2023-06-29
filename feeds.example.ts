@@ -1,4 +1,4 @@
-{
+export default {
   // 2023 Semester Two
   "ELECTENG/COMPSYS 209: Analogue and Digital Design": [
     {
