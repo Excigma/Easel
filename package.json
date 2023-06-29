@@ -52,7 +52,7 @@
     "dev": "tsup --watch --onSuccess \"node ./dist/index.js\"",
     "deploy": "scripts/deploy.sh",
     "logs": "scripts/logs.sh",
-    "forward": "scripts/logs.sh",
+    "forward": "scripts/forward.sh",
     "lint": "standard --fix"
   }
 }
