@@ -1,11 +1,14 @@
 // TODO: Use @sapphire/plugin-utilities-store
-import TurndownService from 'turndown'
+import TurndownService, { type Node } from 'turndown'
 
 const turndownService = new TurndownService({
+  headingStyle: 'atx',
   hr: '---',
   bulletListMarker: '-',
   codeBlockStyle: 'fenced',
-  emDelimiter: '*'
+  fence: '```',
+  emDelimiter: '*',
+  strongDelimiter: '**'
 })
   .addRule('strikethrough', {
     filter: ['del', 's'],
@@ -18,6 +21,20 @@ const turndownService = new TurndownService({
   .addRule('table', {
     filter: 'table',
     replacement: () => '\n\n**[There is a table here that cannot be displayed]**\n\n'
+  })
+  .addRule('a', {
+    filter: function (node: Node) {
+      return (
+        node.nodeName === 'A' &&
+        node.getAttribute('href')
+      )
+    },
+
+    replacement: function (content, node: Node) {
+      let href: string = node.getAttribute('href')
+      if (href.startsWith('/')) href = `https://${process.env.CANVAS_BASE_URL}${href}`
+      return `*[${content}]: (${href})*`
+    }
   })
 
 const DISCORD_DESCRIPTION_LIMIT = 4096
