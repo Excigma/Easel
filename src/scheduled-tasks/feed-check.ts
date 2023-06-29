@@ -1,27 +1,16 @@
-const { PermissionFlagsBits } = require('discord.js')
-const { Time } = require('@sapphire/time-utilities')
-const { xxh32 } = require('@node-rs/xxhash')
+import { Message, MessagePayload, PermissionFlagsBits, TextChannel, type MessageEditOptions, type MessageCreateOptions } from 'discord.js'
+import { Time } from '@sapphire/time-utilities'
+import { xxh32 } from '@node-rs/xxhash'
+import { prisma } from '../lib/prisma'
+import { ScheduledTask } from '@sapphire/plugin-scheduled-tasks'
+import { fetchFeed, formatFeed } from '../lib/serviceAdapters/feed'
+import { ApplyOptions } from '@sapphire/decorators'
 
-const { prisma } = require('../lib/prisma')
+import courses from '../../feeds.json' assert { type: 'json' }
 
-const { ScheduledTask } = require('@sapphire/plugin-scheduled-tasks')
-const { fetchFeed, formatFeed } = require('../lib/serviceAdapters/feed')
-
-const courses = require('../../feeds.json')
-
+@ApplyOptions<ScheduledTask.Options>({ interval: Time.Minute * 5 })
 class FeedCheckTask extends ScheduledTask {
-  /**
-   * @param {ScheduledTask.Context} context
-   * @param {ScheduledTask.Options} options
-   */
-  constructor (context, options) {
-    super(context, {
-      ...options,
-      interval: Time.Minute * 5
-    })
-  }
-
-  async run () {
+  async run (): Promise<void> {
     this.container.logger.info('FeedCheck: Running')
 
     for (const [courseId, feeds] of Object.entries(courses)) {
@@ -49,19 +38,21 @@ class FeedCheckTask extends ScheduledTask {
             })
 
             // Check if the announcement has already been posted
-            if (previousPosts.length && previousPosts.some(post => post.hash === hash)) continue
+            if ((previousPosts.length > 0) && previousPosts.some(post => post.hash === hash)) continue
 
             try {
               const guildChannel = await this.container.client.channels.fetch(channel)
 
+              if (guildChannel == null || !(guildChannel instanceof TextChannel)) continue
+
               if (!guildChannel.permissionsFor(this.container.client.user.id).has([PermissionFlagsBits.SendMessages, PermissionFlagsBits.EmbedLinks])) {
-                return this.container.logger.info(`FeedCheck: Missing permissions to send messages in channel ${channel.id}`)
+                return this.container.logger.info(`FeedCheck: Missing permissions to send messages in channel ${channel}`)
               }
 
               let newMessage
               const messageContent = this.generateMessage(announcement, previousPosts)
 
-              if (previousPosts.length) {
+              if (previousPosts.length > 0) {
                 // Reply to the previous message if there is a previous message
                 const previousMessage = await guildChannel.messages.fetch(previousPosts[0].messageId)
                 newMessage = await previousMessage.reply(messageContent)
@@ -93,7 +84,7 @@ class FeedCheckTask extends ScheduledTask {
     }
   }
 
-  generateMessage (announcement, previousPosts) {
+  generateMessage (announcement, previousPosts): MessagePayload | MessageCreateOptions {
     const embed = {
       title: announcement.title,
       url: announcement.link,
@@ -124,7 +115,7 @@ class FeedCheckTask extends ScheduledTask {
     }
   }
 
-  generateEditMessage (newMessage, previousMessage) {
+  generateEditMessage (newMessage: Message, previousMessage: Message): MessagePayload | MessageEditOptions {
     let newContent = `🛑 There is a more updated version of this announcement below:\n${newMessage.url}\n\n`
 
     if (!previousMessage.content.includes('🛑')) {

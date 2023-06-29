@@ -1,19 +1,5 @@
 // TODO: Use @sapphire/plugin-utilities-store
-const TurndownService = require('turndown')
-
-// Pull string manipulation functions out to ensure consistency and make future emoji changes easier
-
-/** Success: The action was successful. */
-const strSuccess = string => `✅ | ${string}`
-
-/** Info: Provides additional info to the user. */
-const strInfo = string => `ℹ️ | ${string}`
-
-/** Warn: It is most likely that the user is not using the command as documented or additional information is required. */
-const strWarn = string => `⚠️ | ${string}`
-
-/** Error: Something went wrong on the backend. */
-const strError = string => `❌ | ${string}`
+import TurndownService from 'turndown'
 
 const turndownService = new TurndownService({
   hr: '---',
@@ -23,11 +9,11 @@ const turndownService = new TurndownService({
 })
   .addRule('strikethrough', {
     filter: ['del', 's'],
-    replacement: content => `~~${content}~~`
+    replacement: (content: string) => `~~${content}~~`
   })
   .addRule('paragraph_spacing', {
     filter: 'p',
-    replacement: content => `${content}\n\n`
+    replacement: (content: string) => `${content}\n\n`
   })
   .addRule('table', {
     filter: 'table',
@@ -39,7 +25,7 @@ const DESCRIPTION_LIMIT = 4000
 
 const TRUNCATION_WARNING = '...'
 
-function HTMLtoDiscordMarkdown (html) {
+export function HTMLtoDiscordMarkdown (html: string): string {
   // TODO: Discord isn't able to handle images (need authentication to see img so can't just embed the url)
   // TODO: Discord isn't able to handle URLs to files properly either. Detect and rename or remove
   const markdown = html
@@ -64,10 +50,10 @@ function HTMLtoDiscordMarkdown (html) {
 
 // By JamesNZL. Function to truncate markdown whilst making sure no bold or italics are chopped off
 // TODO: Maybe get it to work with ` and other characters, however, it shouldn't be essential
-function truncateMarkdown (
+export function truncateMarkdown (
   markdown,
   descriptionLimit = Math.min(DESCRIPTION_LIMIT, DISCORD_DESCRIPTION_LIMIT)
-) {
+): string {
   const truncateAt = (markdown.length > descriptionLimit)
     ? descriptionLimit - TRUNCATION_WARNING.length
     : descriptionLimit
@@ -135,13 +121,4 @@ function truncateMarkdown (
 
 function escapeRegExp (string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
-}
-
-module.exports = {
-  strSuccess,
-  strInfo,
-  strWarn,
-  strError,
-  HTMLtoDiscordMarkdown,
-  truncateMarkdown
 }

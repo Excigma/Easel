@@ -1,11 +1,11 @@
-const { extract } = require('@extractus/feed-extractor')
-const { truncateMarkdown, HTMLtoDiscordMarkdown } = require('../utils')
+import { extract } from '@extractus/feed-extractor'
+import { truncateMarkdown, HTMLtoDiscordMarkdown } from '../utils'
 
-// We're only supporting The University of Auckland's Canvas instance for now
 const FEED_REGEX = /^https:\/\/canvas\.auckland\.ac\.nz\/feeds\/announcements\/enrollment_[a-zA-Z0-9]+\.atom$/
-const validateFeedUrl = url => FEED_REGEX.test(url)
 
-const fetchFeed = async (url) => {
+export const validateFeedUrl = (url: string): boolean => FEED_REGEX.test(url)
+
+export const fetchFeed = async (url: string): Promise<any> => {
   if (!validateFeedUrl(url)) {
     throw new Error('Invalid Canvas calendar URL')
   }
@@ -18,22 +18,18 @@ const fetchFeed = async (url) => {
   return feed
 }
 
-const formatFeed = (data) => {
+export const formatFeed = (data: any[]): any[] => {
   if (!Array.isArray(data.entry)) data.entry = [data.entry]
 
   // Limit to 5 entries announcements to limit abuse by subscribing to a course with a lot of announcements
   data.entry.length = Math.min(data.entry.length, 5)
 
-  return data.entry.map(entry => {
-    const content = truncateMarkdown(HTMLtoDiscordMarkdown(entry.content || "This announcement doesn't have any content"))
+  return data.entry.map((entry: any) => {
+    const content = truncateMarkdown(
+      HTMLtoDiscordMarkdown(entry.content || "This announcement doesn't have any content")
+    )
     const title = entry.title || 'Untitled announcement'
 
     return { ...entry, content, title }
   })
-}
-
-module.exports = {
-  validateFeedUrl,
-  fetchFeed,
-  formatFeed
 }

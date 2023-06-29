@@ -1,20 +1,12 @@
-const { Command, RegisterBehavior } = require('@sapphire/framework')
+import { ApplyOptions } from '@sapphire/decorators'
+import { Command, RegisterBehavior } from '@sapphire/framework'
 
+@ApplyOptions<Command.Options>({
+  name: 'about',
+  description: 'Information about Easel'
+})
 class AboutCommand extends Command {
-  /**
-   * @param {import('@sapphire/framework').Command.Context} context
-   * @param {import('@sapphire/framework').Command.Options} options
-   */
-  constructor (context, options) {
-    super(context, {
-      ...options,
-      name: 'about',
-      description: 'Information about Easel'
-    })
-  }
-
-  /** @param {import('@sapphire/framework').ApplicationCommandRegistry} registry */
-  registerApplicationCommands (registry) {
+  public override registerApplicationCommands (registry: Command.Registry): void {
     registry.registerChatInputCommand(builder => builder
       .setName(this.name)
       .setDescription(this.description),
@@ -24,8 +16,7 @@ class AboutCommand extends Command {
     })
   }
 
-  /** @param {import('discord.js').Interaction} interaction */
-  async chatInputRun (interaction) {
+  public async chatInputRun (interaction: Command.ChatInputCommandInteraction): Promise<void> {
     const about = [
       "Easel is a Discord bot that provides a bridge between the University of Auckland's Canvas LMS and Discord.",
       '',
@@ -36,7 +27,7 @@ class AboutCommand extends Command {
       "However, to be honest, using the methods Easel now uses to fetch data directly may be more favorable. For example, you can use an RSS reader for Canvas announcements and import the calendar into your phone's calendar. That way, you can stay up-to-date with everything happening on Canvas without having to rely on Easel."
     ].join('\n')
 
-    return await interaction.reply({
+    await interaction.reply({
       content: about,
       ephemeral: true
     })

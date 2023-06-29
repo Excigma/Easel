@@ -1,15 +1,13 @@
-require('@sapphire/plugin-hmr/register')
-require('@sapphire/plugin-logger/register')
-require('@sapphire/plugin-subcommands/register')
-require('@sapphire/plugin-utilities-store/register')
-require('@sapphire/plugin-scheduled-tasks/register')
+import 'dotenv/config'
+import '@sapphire/plugin-hmr/register'
+import '@sapphire/plugin-logger/register'
+import '@sapphire/plugin-subcommands/register'
+import '@sapphire/plugin-utilities-store/register'
+import '@sapphire/plugin-scheduled-tasks/register'
 
-require('dotenv').config()
-require('require-json5').replace()
-
-const { BucketScope, LogLevel, SapphireClient } = require('@sapphire/framework')
-const { ActivityType, Partials, GatewayIntentBits } = require('discord.js')
-const sapphireOverrides = require('./lib/sapphireOverrides')
+import { BucketScope, LogLevel, SapphireClient } from '@sapphire/framework'
+import { ActivityType, Partials, GatewayIntentBits } from 'discord.js'
+import { sapphireOverrides } from './lib/sapphireOverrides'
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -48,7 +46,7 @@ const client = new SapphireClient({
     bull: {
       connection: {
         host: process.env.REDIS_HOST,
-        port: process.env.REDIS_PORT,
+        port: parseInt(process.env.REDIS_PORT ?? '6379'),
         password: process.env.REDIS_PASSWORD
       }
     }
@@ -58,3 +56,7 @@ const client = new SapphireClient({
 sapphireOverrides()
 
 client.login(process.env.DISCORD_TOKEN)
+  .catch(error => {
+    client.logger.fatal(error)
+    process.exit(1)
+  })

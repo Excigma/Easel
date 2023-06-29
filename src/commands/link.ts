@@ -1,76 +1,52 @@
-const { Subcommand } = require('@sapphire/plugin-subcommands')
-const { prisma } = require('../lib/prisma')
-const { strError, strSuccess, strInfo } = require('../lib/utils')
-const { validateCalendarUrl } = require('../lib/serviceAdapters/calendar')
-const { DATABASE_ACCESS_ERROR } = require('../lib/consts')
-const { RegisterBehavior } = require('@sapphire/framework')
+import { Subcommand } from '@sapphire/plugin-subcommands'
+import { prisma } from '../lib/prisma'
+import { validateCalendarUrl } from '../lib/serviceAdapters/calendar'
+import { DATABASE_ACCESS_ERROR, strError, strSuccess, strInfo } from '../lib/constants'
+import { RegisterBehavior } from '@sapphire/framework'
+import { ApplyOptions } from '@sapphire/decorators'
 
 const LINK_SUCCESSFUL = 'Cool. The service has been linked to Easel successfully.'
 
 // TODO: De-duplicate code if possible
-class LinkCommand extends Subcommand {
-  /**
-   * @param {import('@sapphire/framework').Subcommand.Context} context
-   * @param {import('@sapphire/framework').Subcommand.Options} options
-   */
-  constructor (context, options) {
-    super(context, {
-      ...options,
-      name: 'link',
-      description: 'Link various services the University of Auckland uses to Easel',
-      subcommands: [
-        {
-          name: 'calendar',
-          chatInputRun: 'chatInputCalendar'
-        },
-        {
-          name: 'panopto',
-          chatInputRun: 'chatInputPanopto'
-        }
-      ]
-    })
-  }
-
-  /** @param {import('@sapphire/framework').ApplicationCommandRegistry} registry */
-  registerApplicationCommands (registry) {
-    registry.registerChatInputCommand(builder => builder
-      .setName(this.name)
-      .setDescription(this.description)
-      .addSubcommand(command =>
-        command
-          .setName('calendar')
-          .setDescription('Link your Canvas calendar to Easel')
-          .addStringOption(option =>
-            option
-              .setName('url')
-              .setDescription('Url of Canvas calendar')
-              .setRequired(false)
-          )
-      )
-      .addSubcommand(command =>
-        command
-          .setName('panopto')
-          .setDescription('Link your Panopto account to Easel')
-      ),
+@ApplyOptions<Subcommand.Options>({
+  name: 'link',
+  description: 'Link various services the University of Auckland uses to Easel',
+  subcommands: [
+    {
+      name: 'calendar',
+      chatInputRun: 'chatInputCalendar'
+    },
+    {
+      name: 'panopto',
+      chatInputRun: 'chatInputPanopto'
+    }
+  ]
+})
+export class LinkCommand extends Subcommand {
+  public override registerApplicationCommands (registry: Subcommand.Registry): void {
+    registry.registerChatInputCommand((builder) =>
+      builder.setName(this.name).setDescription(this.description),
     {
       idHints: ['1063973473824804875'],
       behaviorWhenNotIdentical: RegisterBehavior.Overwrite
     })
   }
 
-  /** @param {import('discord.js').Interaction} interaction */
-  async chatInputCalendar (interaction) {
+  public async chatInputCalendar (interaction: Subcommand.ChatInputCommandInteraction): Promise<void> {
     const url = interaction.options.getString('url')
 
-    if (!url) {
-      return await this.canvasCalendarInstructions(interaction)
+    if (url === null) {
+      await this.canvasCalendarInstructions(interaction)
+      return
     }
 
     if (!validateCalendarUrl(url)) {
-      return await interaction.reply({
+      await interaction.reply({
         content: strError('The url you provided is not a valid Canvas calendar url. Run `/link calendar` without a url to get instructions on how to get your Canvas calendar url'),
         ephemeral: true
       })
+
+      return
     }
 
     await interaction.deferReply({ ephemeral: true })
@@ -98,30 +74,27 @@ class LinkCommand extends Subcommand {
         }
       })
 
-      return interaction.editReply({
-        content: strSuccess(`${LINK_SUCCESSFUL} You can now use the \`/due\` command to check your upcoming deadlines.`),
-        ephemeral: true
+      await interaction.editReply({
+        content: strSuccess(`${LINK_SUCCESSFUL} You can now use the \`/due\` command to check your upcoming deadlines.`)
       })
     } catch (error) {
       this.container.logger.error(error)
 
-      return (interaction.replied ? interaction.followUp : interaction.reply)({
+      await (interaction.replied ? interaction.followUp : interaction.reply)({
         content: strError(DATABASE_ACCESS_ERROR),
         ephemeral: true
       })
     }
   }
 
-  /** @param {import('discord.js').Interaction} interaction */
-  async chatInputPanopto (interaction) {
-    return await interaction.reply({
+  public async chatInputPanopto (interaction: Subcommand.ChatInputCommandInteraction): Promise<void> {
+    await interaction.reply({
       content: strInfo('This subcommand is still under construction 🚧'),
       ephemeral: true
     })
   }
 
-  /** @param {import('discord.js').Interaction} interaction */
-  async canvasCalendarInstructions (interaction) {
+  public async canvasCalendarInstructions (interaction: Subcommand.ChatInputCommandInteraction): Promise<void> {
     const instructions = [
       '**Disclaimer:**',
       'Your iCalendar link is a unique url that allows you to share your calendar with applications like Easel.',
@@ -142,11 +115,9 @@ class LinkCommand extends Subcommand {
       '4. Run the `/link calendar` command and paste the url in the `url` option'
     ].join('\n')
 
-    return await interaction.reply({
+    await interaction.reply({
       content: strInfo(instructions),
       ephemeral: true
     })
   }
 }
-
-module.exports = { LinkCommand }

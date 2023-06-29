@@ -2,14 +2,20 @@
   "name": "easel",
   "version": "1.0.0",
   "description": "Easel is a Discord Bot created to interact with Canvas and Panopto, acting as a bridge between Discord and University of Auckland hosted services to help students stay on top of content and deadlines.",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "repository": "https://github.com/Excigma/Easel.git",
   "author": "@excigma",
   "license": "MIT",
   "packageManager": "yarn@3.6.0",
+  "type": "commonjs",
   "devDependencies": {
-    "@sapphire/prettier-config": "^1.4.5",
-    "standard": "^17.1.0"
+    "@sapphire/ts-config": "^4.0.0",
+    "@types/node": "^18.16.18",
+    "@types/turndown": "^5.0.1",
+    "@types/ws": "^8.5.5",
+    "ts-standard": "^12.0.2",
+    "tsup": "^7.1.0",
+    "typescript": "^5.1.3"
   },
   "dependencies": {
     "@discordjs/builders": "^1.6.3",
@@ -34,16 +40,19 @@
     "dotenv": "^16.3.1",
     "erlpack": "^0.1.4",
     "html-entities": "^2.4.0",
-    "node-cron": "^3.0.2",
     "node-ical": "^0.16.1",
     "prisma": "^4.16.1",
-    "require-json5": "^1.3.0",
     "turndown": "^7.1.2",
     "zlib-sync": "^0.1.8"
   },
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "node src/index.js",
+    "build": "tsup",
+    "watch": "tsup --watch",
+    "start": "node dist/index.js",
+    "dev": "tsup --watch --onSuccess \"node ./dist/index.js\"",
+    "deploy": "scripts/deploy.sh",
+    "logs": "scripts/logs.sh",
+    "forward": "scripts/logs.sh",
     "lint": "standard --fix"
   }
 }

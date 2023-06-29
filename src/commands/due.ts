@@ -1,28 +1,19 @@
-const { prisma } = require('../lib/prisma')
-const { Command, RegisterBehavior } = require('@sapphire/framework')
-const { strError, strWarn } = require('../lib/utils')
-const { fetchCalendar, formatCalendar } = require('../lib/serviceAdapters/calendar')
-const { PaginatedMessage } = require('@sapphire/discord.js-utilities')
+import { ApplyOptions } from '@sapphire/decorators'
+import { prisma } from '../lib/prisma'
+import { Command, RegisterBehavior } from '@sapphire/framework'
+import { fetchCalendar, formatCalendar } from '../lib/serviceAdapters/calendar'
+import { PaginatedMessage } from '@sapphire/discord.js-utilities'
 
-const { EmbedBuilder, PermissionFlagsBits } = require('discord.js')
-const { DATABASE_ACCESS_ERROR } = require('../lib/consts')
+import { EmbedBuilder, PermissionFlagsBits } from 'discord.js'
+import { DATABASE_ACCESS_ERROR, strError, strWarn } from '../lib/constants'
 
-class DueCommand extends Command {
-  /**
-   * @param {import('@sapphire/framework').Command.Context} context
-   * @param {import('@sapphire/framework').Command.Options} options
-   */
-  constructor (context, options) {
-    super(context, {
-      ...options,
-      name: 'due',
-      description: 'Check upcoming deadlines that are set on Canvas',
-      requiredClientPermissions: [PermissionFlagsBits.EmbedLinks]
-    })
-  }
-
-  /** @param {import('@sapphire/framework').ApplicationCommandRegistry} registry */
-  registerApplicationCommands (registry) {
+@ApplyOptions<Command.Options>({
+  name: 'due',
+  description: 'Check upcoming deadlines that are set on Canvas',
+  requiredClientPermissions: [PermissionFlagsBits.EmbedLinks]
+})
+export class DueCommand extends Command {
+  public override registerApplicationCommands (registry: Command.Registry): void {
     registry.registerChatInputCommand(builder => builder
       .setName(this.name)
       .setDescription(this.description), {
@@ -31,8 +22,7 @@ class DueCommand extends Command {
     })
   }
 
-  /** @param {import('discord.js').Interaction} interaction */
-  async chatInputRun (interaction) {
+  public async chatInputRun (interaction: Command.ChatInputCommandInteraction): Promise<void> {
     try {
       // Check if the user has their canvasICalendar relational field set
       const user = await prisma.user.findUnique({
@@ -44,11 +34,13 @@ class DueCommand extends Command {
         }
       })
 
-      if (!user?.canvasCalendar) {
-        return interaction.reply({
+      if ((user?.canvasCalendar) == null) {
+        await interaction.reply({
           content: strWarn('It seems that your Canvas calendar url has not been linked yet. The `/due` command needs to access your Canvas calendar to retrieve due dates. You can link your calendar url using the `/link calendar` command'),
           ephemeral: true
         })
+
+        return
       }
 
       await interaction.deferReply()
@@ -57,7 +49,7 @@ class DueCommand extends Command {
 
       // Sometimes channel is null - attempt to fetch the channel if it's null, otherwise
       // send an unpaginated response.
-      if (!interaction.channel) {
+      if (interaction.channel == null) {
         try {
           await this.container.client.channels.fetch(interaction.channelId)
         } catch (error) {
@@ -66,10 +58,12 @@ class DueCommand extends Command {
           // TODO: Proper error handling.
           // If missing access, then tell user that the bot needs to be re-invited
 
-          return (interaction.replied ? interaction.followUp : interaction.reply)({
+          await (interaction.replied ? interaction.followUp : interaction.reply)({
             content: strWarn('I do not have permission to view this channel. Permission to view this channel is required for pagination, and this command to work.'),
             ephemeral: true
           })
+
+          return
         }
       }
 
@@ -105,7 +99,7 @@ class DueCommand extends Command {
       }
 
       // Add a placeholder warning if there are no due dates
-      if (!data.length) {
+      if (data.length === 0) {
         page = [
           'It appears that there are no upcoming due dates at this time.',
           '',
@@ -115,16 +109,14 @@ class DueCommand extends Command {
 
       paginatedMessage.addPageEmbed((embed) => embed.setDescription(page))
 
-      return await paginatedMessage.run(interaction)
+      await paginatedMessage.run(interaction)
     } catch (error) {
       this.container.logger.error(error)
 
-      return (interaction.replied ? interaction.followUp : interaction.reply)({
+      await (interaction.replied ? interaction.followUp : interaction.reply)({
         content: strError(DATABASE_ACCESS_ERROR),
         ephemeral: true
       })
     }
   }
 }
-
-module.exports = { DueCommand }

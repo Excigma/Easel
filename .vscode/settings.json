@@ -9,4 +9,6 @@
   "cSpell.words": [
     "Panopto"
   ],
+  "standard.enableGlobally": true,
+  "standard.engine": "ts-standard",
 }
