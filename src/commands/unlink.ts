@@ -24,8 +24,24 @@ import { DATABASE_ACCESS_ERROR, DATABASE_STORE_SUCCESSFUL, strError, strWarn, st
 })
 class UnlinkCommand extends Subcommand {
   registerApplicationCommands (registry: Command.Registry): void {
-    registry.registerChatInputCommand((builder) =>
-      builder.setName(this.name).setDescription(this.description),
+    registry.registerChatInputCommand(builder => builder
+      .setName(this.name)
+      .setDescription(this.description)
+      .addSubcommand(command =>
+        command
+          .setName('calendar')
+          .setDescription('Unlink your Canvas calendar from Easel')
+      )
+      .addSubcommand(command =>
+        command
+          .setName('all')
+          .setDescription('Unlink all accounts from Easel')
+      )
+      .addSubcommand(command =>
+        command
+          .setName('panopto')
+          .setDescription('Unlink your Panopto account from Easel')
+      ),
     {
       idHints: ['1065170308950147092'],
       behaviorWhenNotIdentical: RegisterBehavior.Overwrite

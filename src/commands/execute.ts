@@ -9,9 +9,9 @@ import { ApplyOptions } from '@sapphire/decorators'
 })
 class ExecuteCommand extends Command {
   registerApplicationCommands (registry: Command.Registry): void {
-    registry.registerChatInputCommand((builder) =>
-      builder.setName(this.name).setDescription(this.description),
-    {
+    registry.registerChatInputCommand(builder => builder
+      .setName(this.name)
+      .setDescription(this.description), {
       idHints: ['1064385467325366293'],
       behaviorWhenNotIdentical: RegisterBehavior.Overwrite
     })

@@ -7,13 +7,13 @@ import { Command, RegisterBehavior } from '@sapphire/framework'
 })
 export class PingCommand extends Command {
   public override registerApplicationCommands (registry: Command.Registry): void {
-    registry.registerChatInputCommand((builder) =>
-      builder.setName(this.name).setDescription(this.description),
+    registry.registerChatInputCommand((builder) => builder
+      .setName(this.name)
+      .setDescription(this.description),
     {
       idHints: ['797033342818189342'],
       behaviorWhenNotIdentical: RegisterBehavior.Overwrite
-    }
-    )
+    })
   }
 
   public async chatInputRun (interaction: Command.ChatInputCommandInteraction): Promise<void> {

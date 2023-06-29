@@ -24,8 +24,25 @@ const LINK_SUCCESSFUL = 'Cool. The service has been linked to Easel successfully
 })
 export class LinkCommand extends Subcommand {
   public override registerApplicationCommands (registry: Subcommand.Registry): void {
-    registry.registerChatInputCommand((builder) =>
-      builder.setName(this.name).setDescription(this.description),
+    registry.registerChatInputCommand((builder) => builder
+      .setName(this.name)
+      .setDescription(this.description)
+      .addSubcommand(command =>
+        command
+          .setName('calendar')
+          .setDescription('Link your Canvas calendar to Easel')
+          .addStringOption(option =>
+            option
+              .setName('url')
+              .setDescription('Url of Canvas calendar')
+              .setRequired(false)
+          )
+      )
+      .addSubcommand(command =>
+        command
+          .setName('panopto')
+          .setDescription('Link your Panopto account to Easel')
+      ),
     {
       idHints: ['1063973473824804875'],
       behaviorWhenNotIdentical: RegisterBehavior.Overwrite
