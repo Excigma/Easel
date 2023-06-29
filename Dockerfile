@@ -3,7 +3,7 @@
 FROM node:20-alpine AS install-dependencies
 
 WORKDIR /usr/app
-ENV NODE_ENV PRODUCTION
+ENV NODE_ENV production
 
 RUN apk add --no-cache python3 make g++
 
@@ -24,7 +24,7 @@ RUN yarn prisma generate
 FROM node:20-alpine as production-dependencies
 
 WORKDIR /usr/app
-ENV NODE_ENV PRODUCTION
+ENV NODE_ENV production
 
 COPY --from=install-dependencies /usr/app/package.json /usr/app/yarn.lock /usr/app/.yarnrc.yml /usr/app
 COPY --from=install-dependencies /usr/app/node_modules /usr/app/node_modules
