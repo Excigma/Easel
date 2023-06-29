@@ -1,4 +1,4 @@
-import { Message, MessagePayload, PermissionFlagsBits, TextChannel, type MessageEditOptions, type MessageCreateOptions } from 'discord.js'
+import { Message, MessagePayload, type MessageEditOptions, type MessageCreateOptions } from 'discord.js'
 import { Time } from '@sapphire/time-utilities'
 import { xxh32 } from '@node-rs/xxhash'
 import { prisma } from '../lib/prisma'
@@ -43,11 +43,7 @@ class FeedCheckTask extends ScheduledTask {
             try {
               const guildChannel = await this.container.client.channels.fetch(channel)
 
-              if (guildChannel == null || !(guildChannel instanceof TextChannel)) continue
-
-              if (!guildChannel.permissionsFor(this.container.client.user.id).has([PermissionFlagsBits.SendMessages, PermissionFlagsBits.EmbedLinks])) {
-                return this.container.logger.info(`FeedCheck: Missing permissions to send messages in channel ${channel}`)
-              }
+              if (guildChannel == null || !guildChannel.isTextBased()) continue
 
               let newMessage
               const messageContent = this.generateMessage(announcement, previousPosts)
