@@ -30,6 +30,6 @@ export const formatFeed = (data: any[]): any[] => {
     )
     const title = entry.title || 'Untitled announcement'
 
-    return { ...entry, content, title }
+    return { ...entry, content, rawContent: entry.content, title }
   })
 }

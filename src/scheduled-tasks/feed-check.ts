@@ -8,7 +8,10 @@ import { ApplyOptions } from '@sapphire/decorators'
 
 import courses from '../../feeds'
 
-@ApplyOptions<ScheduledTask.Options>({ interval: Time.Minute * 5 })
+@ApplyOptions<ScheduledTask.Options>({
+  name: 'feed-check',
+  interval: Time.Minute * 5
+})
 class FeedCheckTask extends ScheduledTask {
   async run (): Promise<void> {
     this.container.logger.info('FeedCheck: Running')
@@ -22,7 +25,7 @@ class FeedCheckTask extends ScheduledTask {
         const announcements = formatFeed(await fetchFeed(feed.rssUrl))
 
         for (const announcement of announcements) {
-          const hash = xxh32(announcement.content).toString(16)
+          const hash = xxh32(announcement.rawContent).toString(16)
 
           for (const channel of feed.channels) {
             // Search Prisma for a broadcast with the same url and channelId
