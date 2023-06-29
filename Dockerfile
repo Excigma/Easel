@@ -5,6 +5,8 @@ FROM node:20-alpine AS install-dependencies
 WORKDIR /usr/app
 ENV NODE_ENV PRODUCTION
 
+RUN apk add --no-cache python3 make g++
+
 # Copy package.json into container and install dependencies for transpilation
 COPY package.json yarn.lock .yarnrc.yml /usr/app
 COPY .yarn /usr/app/.yarn
@@ -54,6 +56,6 @@ COPY --from=build-environment /usr/app/dist /usr/app/dist
 COPY .env /usr/app
 
 # Run process as a new non-privileged user
-USER nonroot
+USER node
 
 CMD ["dist/index.js"]
