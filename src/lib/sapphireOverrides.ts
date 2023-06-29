@@ -54,7 +54,7 @@ export function sapphireOverrides (): void {
     {
       customId: '@sapphire/paginated-messages.stop',
       style: ButtonStyle.Danger,
-      label: 'Delete',
+      label: 'Stop',
       type: ComponentType.Button,
       run: ({ collector }) => {
         collector.stop()
