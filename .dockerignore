@@ -1,12 +1,20 @@
-# Dependency directories
+Dockerfile
+.dockerignore
 node_modules
-.pnp.*
+npm-debug.log
+README.md
+.git
+.DS_Store
 .yarn/*
+!.yarn/cache
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
 
- # Build directory
+# Build directory
 dist
+.next
+out
+build

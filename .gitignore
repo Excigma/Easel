@@ -1,7 +1,6 @@
 # Dependency directories
-node_modules
-.pnp.*
 .yarn/*
+!.yarn/cache
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
@@ -30,3 +29,4 @@ data
 dist/
 data/
 scripts/
+.prisma

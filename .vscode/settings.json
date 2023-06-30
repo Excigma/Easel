@@ -11,4 +11,6 @@
   ],
   "standard.enableGlobally": true,
   "standard.engine": "ts-standard",
+  "typescript.tsdk": ".yarn/sdks/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true
 }

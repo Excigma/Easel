@@ -1,14 +1,17 @@
 {
 	"extends": "@sapphire/ts-config",
 	"compilerOptions": {
-		"rootDir": ".",
 		"outDir": "dist",
 		"tsBuildInfoFile": "dist/.tsbuildinfo",
 		"experimentalDecorators": true,
 		"incremental": true,
-		"module": "esnext"
+		"module": "esnext",
+		"moduleResolution": "node",
 	},
-	"include": [
-		"src"
-	]
+  "include": [
+		"src",
+		"next-env.d.ts",
+		"**/*.ts",
+		"**/*.tsx"
+	],
 }
