@@ -1,5 +1,5 @@
 import { PrismaClient } from '../../.prisma/client'
 
 export const prisma = new PrismaClient({
-  rejectOnNotFound: false
+  // rejectOnNotFound: false
 })

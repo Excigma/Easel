@@ -10,16 +10,18 @@ import courses from '../../feeds'
 
 @ApplyOptions<ScheduledTask.Options>({
   name: 'feed-check',
-  interval: Time.Minute * 5
+  interval: Time.Minute * 10
 })
-class FeedCheckTask extends ScheduledTask {
+export class FeedCheckTask extends ScheduledTask {
   async run (): Promise<void> {
     this.container.logger.info('FeedCheck: Running')
 
     for (const [courseId, feeds] of Object.entries(courses)) {
-    // TODO: Check if other channels are also subscribed to the same feeds
-    // Note: This code is of poor quality and was written a day before semester starts
-    // to get the bot borderline functioning enough to be used.
+      // TODO: Check if other channels are also subscribed to the same feeds
+      // Note: This code is of poor quality and was written a day before semester starts
+      // to get the bot borderline functioning enough to be used.
+
+      const contributors = feeds.map(feed => feed.contributor);
 
       for (const feed of feeds) {
         const announcements = formatFeed(await fetchFeed(feed.rssUrl))
@@ -49,7 +51,7 @@ class FeedCheckTask extends ScheduledTask {
               if (guildChannel == null || !guildChannel.isTextBased()) continue
 
               let newMessage
-              const messageContent = this.generateMessage(announcement, previousPosts)
+              const messageContent = this.generateMessage(announcement, previousPosts, contributors)
 
               if (previousPosts.length > 0) {
                 // Reply to the previous message if there is a previous message
@@ -83,12 +85,15 @@ class FeedCheckTask extends ScheduledTask {
     }
   }
 
-  generateMessage (announcement, previousPosts): MessagePayload | MessageCreateOptions {
+  generateMessage (announcement, previousPosts, contributors): MessagePayload | MessageCreateOptions {
     const embed = {
       title: announcement.title,
       url: announcement.link,
       color: 0x2694D7,
-      description: announcement.content
+      description: announcement.content,
+      footer: {
+        text: `Contributed via ${contributors.join(", ")}'s Canvas`
+      },
     }
 
     // Check if there is an author name or profile picture, if there is then add it to the embed
@@ -130,4 +135,3 @@ class FeedCheckTask extends ScheduledTask {
   }
 }
 
-module.exports = { FeedCheckTask }

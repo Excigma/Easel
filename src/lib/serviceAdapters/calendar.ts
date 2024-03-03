@@ -1,5 +1,7 @@
-import { async as ical } from 'node-ical'
+import icalRoot from 'node-ical'
 import { Time } from '@sapphire/time-utilities'
+
+const ical = icalRoot.async;
 
 const COURSE_MATCH = / \[([A-Z0-9 /]+)\]$/
 const CALENDAR_REGEX = /^https:\/\/canvas\.auckland\.ac\.nz\/feeds\/calendars\/user_[a-zA-Z0-9]+\.ics$/

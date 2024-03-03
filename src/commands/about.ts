@@ -5,7 +5,7 @@ import { Command, RegisterBehavior } from '@sapphire/framework'
   name: 'about',
   description: 'Information about Easel'
 })
-class AboutCommand extends Command {
+export class AboutCommand extends Command {
   public override registerApplicationCommands (registry: Command.Registry): void {
     registry.registerChatInputCommand(builder => builder
       .setName(this.name)
@@ -34,4 +34,3 @@ class AboutCommand extends Command {
   }
 }
 
-module.exports = { AboutCommand }
