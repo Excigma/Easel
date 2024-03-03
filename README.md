@@ -1,7 +1,5 @@
 # Easel
 
-> Easel is currently beta software and will remain, for the coming future, a work in progress. The code is likely buggy, un-optimized and bad. It is not ready for widespread use.
-
 Easel is a Discord Bot created to interact with Canvas and Panopto, acting as a bridge between Discord and University of Auckland hosted services to help students stay on top of content and deadlines.
 
 During semester one of university, I've noticed that I haven't checked my Canvas announcements frequently enough, and thus missed a quiz and some important notes. Easel was a Discord integration that was made to fill this gap.
