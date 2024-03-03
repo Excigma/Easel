@@ -5,6 +5,8 @@ RUN apk add --no-cache python3 make g++
 
 COPY .yarn /usr/app/.yarn
 COPY package.json yarn.lock .yarnrc.yml .pnp.cjs /usr/app
+RUN yarn set version stable
+
 RUN yarn install --immutable
 
 ENV NODE_ENV production
