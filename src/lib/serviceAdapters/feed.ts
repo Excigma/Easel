@@ -21,9 +21,14 @@ export const fetchFeed = async (url: string): Promise<any> => {
 export const formatFeed = (data: any[]): any[] => {
   if (!Array.isArray(data.entry)) data.entry = [data.entry]
 
+  // Reverse order of announcements
+  // data.entry.reverse();
+
   // Limit to 5 entries announcements to limit abuse by subscribing to a course with a lot of announcements
   data.entry.length = Math.min(data.entry.length, 5)
-
+  
+  // Reverse order of announcements so oldest is first
+  data.entry.reverse();
   return data.entry.map((entry: any) => {
     const content = truncateMarkdown(
       HTMLtoDiscordMarkdown(entry.content || "This announcement doesn't have any content")
