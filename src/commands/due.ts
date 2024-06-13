@@ -101,7 +101,7 @@ export class DueCommand extends Command {
         page = [
           'It appears that there are no upcoming due dates at this time. It may be a good opportunity to touch grass now.',
           '',
-          'However, we advise you to check your [calender on Canvas](https://canvas.auckland.ac.nz/calendar) to confirm this and to check other platforms for any additional deadlines.'
+          'However, we advise you to check your [calendar on Canvas](https://canvas.auckland.ac.nz/calendar) to confirm this and to check other platforms for any additional deadlines.'
         ].join('\n')
       }
 
