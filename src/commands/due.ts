@@ -35,7 +35,11 @@ export class DueCommand extends Command {
 
       if ((user?.canvasCalendar) == null) {
         await interaction.reply({
-          content: strWarn('It seems that your Canvas calendar url has not been linked yet. The `/due` command needs to access your Canvas calendar to retrieve due dates. You can link your calendar URL
+          content: strWarn('It seems that your Canvas calendar URL has not been linked yet. The `/due` command needs to access your Canvas calendar to retrieve due dates. You can link your calendar URL using the `/link calendar` command'),
+          ephemeral: true
+        })
+
+        return
       }
 
       await interaction.deferReply()
