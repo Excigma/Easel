@@ -35,11 +35,7 @@ export class DueCommand extends Command {
 
       if ((user?.canvasCalendar) == null) {
         await interaction.reply({
-          content: strWarn('It seems that your Canvas calendar url has not been linked yet. The `/due` command needs to access your Canvas calendar to retrieve due dates. You can link your calendar url using the `/link calendar` command'),
-          ephemeral: true
-        })
-
-        return
+          content: strWarn('It seems that your Canvas calendar url has not been linked yet. The `/due` command needs to access your Canvas calendar to retrieve due dates. You can link your calendar URL
       }
 
       await interaction.deferReply()
@@ -101,7 +97,7 @@ export class DueCommand extends Command {
         page = [
           'It appears that there are no upcoming due dates at this time. It may be a good opportunity to touch grass now.',
           '',
-          'However, we advise you to check your [calender on Canvas](https://canvas.auckland.ac.nz/calendar) to confirm this and to check other platforms for any additional deadlines.'
+          'However, we recommend checking your [calendar on Canvas](https://canvas.auckland.ac.nz/calendar) to confirm this and to check other platforms for any additional deadlines.'
         ].join('\n')
       }
 

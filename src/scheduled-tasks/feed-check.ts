@@ -126,7 +126,7 @@ export class FeedCheckTask extends ScheduledTask {
   }
 
   generateEditMessage(newMessage: Message, previousMessage: Message): MessagePayload | MessageEditOptions {
-    let newContent = `🛑 This announcement has been edited. See latest version below: ${newMessage.url}\n\n`
+    let newContent = `🛑 This announcement has been edited. See latest version at: ${newMessage.url}\n\n`
 
     if (!previousMessage.content.includes('🛑')) {
       newContent += '🛑 The contents of this message are now __outdated__.\n'

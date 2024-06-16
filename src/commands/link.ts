@@ -33,7 +33,7 @@ export class LinkCommand extends Subcommand {
           .addStringOption(option =>
             option
               .setName('url')
-              .setDescription('Url of Canvas calendar')
+              .setDescription('URL of Canvas calendar')
               .setRequired(false)
           )
       )
@@ -54,7 +54,7 @@ export class LinkCommand extends Subcommand {
 
     if (!validateCalendarUrl(url)) {
       await interaction.reply({
-        content: strError('The url you provided is not a valid Canvas calendar url. Run `/link calendar` without a url to get instructions on how to get your Canvas calendar url'),
+        content: strError('The URL you provided is not a valid Canvas calendar URL. Run `/link calendar` without a URL to get instructions on how to get your Canvas calendar URL'),
         ephemeral: true
       })
 
@@ -109,11 +109,11 @@ export class LinkCommand extends Subcommand {
   public async canvasCalendarInstructions(interaction: Subcommand.ChatInputCommandInteraction): Promise<void> {
     const instructions = [
       '**Disclaimer:**',
-      'Your iCalendar link is a unique url that allows you to share your calendar with applications like Easel.',
+      'Your iCalendar link is a unique URL that allows you to share your calendar with applications like Easel.',
       'By providing us with your Canvas calendar link, you will give us permission to access your calendar on Canvas.',
       '',
       'We cannot make any changes to your Canvas account nor will we share your information with anyone else.',
-      "We'll use your calendar solely to provide you with a list of upcoming events in Easel with the `/due` command to help you stay organized and up-to-date with deadlines assigned on Canvas.",
+      "We'll use your calendar solely to provide you with a list of upcoming events in Easel with the `/due` command to help you stay organised and up-to-date with deadlines assigned on Canvas.",
       '',
       "Easel may omit events from your calendar if there is no set deadline for the event. Don't solely rely on Easel to keep track of your deadlines. It is meant to be a tool to supplement your existing workflow.",
       '',
@@ -123,8 +123,8 @@ export class LinkCommand extends Subcommand {
       '**Instructions:**',
       '1. Visit your Canvas calendar at: <https://canvas.auckland.ac.nz/calendar>',
       '2. Click the `Calendar feed` button in the bottom right corner',
-      '3. Copy the url in the popup prompt',
-      '4. Run the `/link calendar` command and paste the url in the `url` option'
+      '3. Copy the URL in the popup prompt',
+      '4. Run the `/link calendar` command and paste the URL in the `url` option'
     ].join('\n')
 
     await interaction.reply({
