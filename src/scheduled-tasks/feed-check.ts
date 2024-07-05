@@ -21,70 +21,72 @@ export class FeedCheckTask extends ScheduledTask {
       // Note: This code is of poor quality and was written a day before semester starts
       // to get the bot borderline functioning enough to be used.
 
-      const contributors = feeds.map(feed => feed.contributor);
+      const contributors = feeds.map(feed => feed.contributor)
+      const aggregatedAnnouncements = []
 
+      // Combine feeds from all users
       for (const feed of feeds) {
-        const announcements = formatFeed(await fetchFeed(feed.rssUrl))
+        aggregatedAnnouncements.push(...formatFeed(await fetchFeed(feed.rssUrl)))
+      }
 
-        for (const announcement of announcements) {
-          const hash = xxh32(announcement.rawContent).toString(16)
+      for (const announcement of aggregatedAnnouncements) {
+        const hash = xxh32(announcement.rawContent).toString(16)
 
-          for (const channel of feed.channels) {
-            // Search Prisma for a broadcast with the same url and channelId
-            const previousPosts = await prisma.broadcast.findMany({
-              where: {
+        for (const channel of feed.channels) {
+          // Search Prisma for a broadcast with the same url and channelId
+          const previousPosts = await prisma.broadcast.findMany({
+            where: {
+              url: announcement.link,
+              channelId: channel,
+              courseId
+            },
+            orderBy: {
+              createdAt: 'desc'
+            }
+          })
+
+          // Check if the announcement has already been posted
+          if ((previousPosts.length > 0) && previousPosts.some(post => post.hash === hash)) continue
+
+          try {
+            const guildChannel = await this.container.client.channels.fetch(channel)
+
+            if (guildChannel == null || !guildChannel.isTextBased()) continue
+
+            let newMessage
+            const messageContent = this.generateMessage(announcement, previousPosts, contributors)
+
+            // Try to reply to the previous message if there is a previous message
+            let previousMessage, hasPreviousMessage = false;
+            if (previousPosts.length > 0) {
+              previousMessage = await guildChannel.messages.fetch(previousPosts[0].messageId).catch(_ => { return null; })
+
+              hasPreviousMessage = (previousMessage !== null);
+            }
+
+            if (hasPreviousMessage) {
+              newMessage = await previousMessage!.reply(messageContent);
+            } else {
+              newMessage = await guildChannel.send(messageContent);
+            }
+
+            await prisma.broadcast.create({
+              data: {
                 url: announcement.link,
                 channelId: channel,
-                courseId
-              },
-              orderBy: {
-                createdAt: 'desc'
+                messageId: newMessage.id,
+                courseId,
+                hash
               }
             })
 
-            // Check if the announcement has already been posted
-            if ((previousPosts.length > 0) && previousPosts.some(post => post.hash === hash)) continue
-
-            try {
-              const guildChannel = await this.container.client.channels.fetch(channel)
-
-              if (guildChannel == null || !guildChannel.isTextBased()) continue
-
-              let newMessage
-              const messageContent = this.generateMessage(announcement, previousPosts, contributors)
-
-              // Try to reply to the previous message if there is a previous message
-              let previousMessage, hasPreviousMessage = false;
-              if (previousPosts.length > 0) {
-                previousMessage = await guildChannel.messages.fetch(previousPosts[0].messageId).catch(_ => { return null; })
-
-                hasPreviousMessage = (previousMessage !== null);
-              }
-
-              if (hasPreviousMessage) {
-                newMessage = await previousMessage!.reply(messageContent);
-              } else {
-                newMessage = await guildChannel.send(messageContent);
-              }
-
-              await prisma.broadcast.create({
-                data: {
-                  url: announcement.link,
-                  channelId: channel,
-                  messageId: newMessage.id,
-                  courseId,
-                  hash
-                }
-              })
-
-              for (const post of previousPosts) {
-                const previousMessage = await guildChannel.messages.fetch(post.messageId)
-                await previousMessage.edit(this.generateEditMessage(newMessage, previousMessage))
-              }
-            } catch (error) {
-              this.container.logger.error(`FeedCheck: Error while sending message to channel ${channel}`)
-              this.container.logger.error(error)
+            for (const post of previousPosts) {
+              const previousMessage = await guildChannel.messages.fetch(post.messageId)
+              await previousMessage.edit(this.generateEditMessage(newMessage, previousMessage))
             }
+          } catch (error) {
+            this.container.logger.error(`FeedCheck: Error while sending message to channel ${channel}`)
+            this.container.logger.error(error)
           }
         }
       }

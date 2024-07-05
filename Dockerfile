@@ -19,6 +19,8 @@ COPY . /usr/app
 RUN yarn pnpify prisma generate
 RUN yarn build
 
+# TODO: Only copy toml here to avoid rebuilding container
+
 # Start the app
 USER node
 CMD ["yarn", "start"]
