@@ -86,7 +86,7 @@ export class DueCommand extends Command {
       // Split due dates up into pages
       for (const event of data) {
         const title = event.url ? `[${event.title}](${event.url})` : event.title
-        const eventText = `**${title}**\n*${event.course}*\n> due <t:${event.timestamp}:R> at <t:${event.timestamp}:F>\n\n`
+        const eventText = `**${title}** - *${event.course}*\n> due <t:${event.timestamp}:R> at <t:${event.timestamp}:F>\n\n`
 
         if (page.length + eventText.length > 1500) {
           paginatedMessage.addPageEmbed((embed) => embed.setDescription(page))
