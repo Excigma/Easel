@@ -8,9 +8,11 @@ import { ApplyOptions } from '@sapphire/decorators'
 
 import courses from '../../feeds'
 
+const INTERVAL = Time.Minute * 5;
+
 @ApplyOptions<ScheduledTask.Options>({
   name: 'feed-check',
-  interval: Time.Minute * 5
+  interval: INTERVAL
 })
 export class FeedCheckTask extends ScheduledTask {
   async run(): Promise<void> {
