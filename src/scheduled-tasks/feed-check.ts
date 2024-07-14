@@ -92,6 +92,8 @@ export class FeedCheckTask extends ScheduledTask {
           }
         }
       }
+
+      await new Promise(resolve => setTimeout(resolve, Math.floor(INTERVAL / Object.entries(courses).length)))
     }
   }
 
