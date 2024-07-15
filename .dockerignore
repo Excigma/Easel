@@ -1,12 +1,16 @@
 Dockerfile
 .dockerignore
 node_modules
+
 npm-debug.log
 README.md
+
 .git
 .DS_Store
+
+# Dependency directories
+.pnp.*
 .yarn/*
-!.yarn/cache
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
