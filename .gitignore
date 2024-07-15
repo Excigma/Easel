@@ -22,9 +22,8 @@ yarn-error.log*
 
 # Application secrets
 .env
-feeds.ts
-config/config.toml
-data
+config/*
+!config/config.example.toml
 
 # Build output
 dist/
