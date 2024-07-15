@@ -101,7 +101,7 @@ export class LinkCommand extends Subcommand {
 
   public async chatInputPanopto(interaction: Subcommand.ChatInputCommandInteraction): Promise<void> {
     await interaction.reply({
-      content: strInfo('This subcommand is still under construction 🚧'),
+      content: strInfo('This subcommand is planned and has not been developed yet 🚧'),
       ephemeral: true
     })
   }

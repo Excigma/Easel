@@ -4,7 +4,7 @@ import { ApplyOptions } from '@sapphire/decorators'
 
 @ApplyOptions<ScheduledTask.Options>({ interval: Time.Day })
 export class DanglingCheckTask extends ScheduledTask {
-  async run (): Promise<void> {
+  async run(): Promise<void> {
     // TODO: Remove Broadcast entries from the database from courses that no longer exist
   }
 }

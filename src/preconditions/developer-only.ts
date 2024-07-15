@@ -4,19 +4,19 @@ import type { CommandInteraction, ContextMenuCommandInteraction, Message, Snowfl
 export class DeveloperOnlyPrecondition extends AllFlowsPrecondition {
   #message = 'This command can only be used by the owner.'
 
-  public override chatInputRun (interaction: CommandInteraction): PreconditionResult {
+  public override chatInputRun(interaction: CommandInteraction): PreconditionResult {
     return this.doOwnerCheck(interaction.user.id)
   }
 
-  public override contextMenuRun (interaction: ContextMenuCommandInteraction): PreconditionResult {
+  public override contextMenuRun(interaction: ContextMenuCommandInteraction): PreconditionResult {
     return this.doOwnerCheck(interaction.user.id)
   }
 
-  public override messageRun (message: Message): PreconditionResult {
+  public override messageRun(message: Message): PreconditionResult {
     return this.doOwnerCheck(message.author.id)
   }
 
-  private doOwnerCheck (userId: Snowflake): PreconditionResult {
+  private doOwnerCheck(userId: Snowflake): PreconditionResult {
     return userId === process.env.OWNER_ID ? this.ok() : this.error({ message: this.#message })
   }
 }

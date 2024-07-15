@@ -26,7 +26,7 @@ export const formatFeed = (data: any[]): any[] => {
 
   // Limit to 5 entries announcements to limit abuse by subscribing to a course with a lot of announcements
   data.entry.length = Math.min(data.entry.length, 5)
-  
+
   // Reverse order of announcements so oldest is first
   data.entry.reverse();
   return data.entry.map((entry: any) => {

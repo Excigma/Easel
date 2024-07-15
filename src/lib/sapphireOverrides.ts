@@ -1,7 +1,7 @@
 import { PaginatedMessage } from '@sapphire/discord.js-utilities'
 import { userMention, ComponentType, ButtonStyle } from 'discord.js'
 
-export function sapphireOverrides (): void {
+export function sapphireOverrides(): void {
   PaginatedMessage.wrongUserInteractionReply = (targetUser) => `This message is for ${userMention(targetUser.id)}. Please run the command yourself to use pagination.`
   PaginatedMessage.embedFooterSeparator = ' | '
   PaginatedMessage.pageIndexPrefix = 'Page'
