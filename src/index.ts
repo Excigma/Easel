@@ -27,10 +27,13 @@ const client = new SapphireClient({
   },
   intents: [
     GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildMessageReactions
   ],
   partials: [
-    Partials.Channel
+    Partials.Channel,
+    Partials.Message,
+    Partials.Reaction
   ],
   presence: {
     activities: [{
