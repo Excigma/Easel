@@ -16,6 +16,7 @@ RUN yarn install --immutable
 
 # Copy Prisma configuration and generate the client
 COPY prisma /usr/app
+RUN yarn pnpify prisma migrate deploy
 RUN yarn pnpify prisma generate
 
 # Copy the rest of the files and build the app
