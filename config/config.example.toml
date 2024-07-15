@@ -1,0 +1,24 @@
+# Example course
+[[feeds]]
+# Name to show in embed footer of the announcement
+contributors = ["Contributor name"]
+# Discord channel IDs to send the announcements to
+channels = ["Channel ID"]
+# RSS feed URLs
+rssUrls = [
+	"RSS feed URL",
+	"https://example.instructure.com/feeds/announcements/enrollment_....atom",
+]
+
+# Example course 2
+[[feeds]]
+contributors = ["Excigma"]
+channels = [
+	# Channel One
+	"193483293489237487",
+	# Channel Two
+	"329048293840923840",
+]
+rssUrls = [
+	"https://example.instructure.com/feeds/announcements/enrollment_dEnfSjw4FjsW6FjsTjqMzo4sSjwGhhsWrNfdGh5s.atom",
+]

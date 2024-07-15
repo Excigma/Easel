@@ -23,6 +23,7 @@ yarn-error.log*
 # Application secrets
 .env
 feeds.ts
+config/config.toml
 data
 
 # Build output

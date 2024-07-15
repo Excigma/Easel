@@ -30,8 +30,6 @@ model Broadcast {
   url  String
   hash String
 
-  courseId String
-
   channelId String
   messageId String
 

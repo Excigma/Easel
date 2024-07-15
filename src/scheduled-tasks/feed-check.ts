@@ -1,46 +1,53 @@
-import { Message, MessagePayload, type MessageEditOptions, type MessageCreateOptions } from 'discord.js'
+import { Message, MessagePayload, APIEmbed, type MessageEditOptions, type MessageCreateOptions } from 'discord.js'
+import { parse } from 'smol-toml'
 import { Time } from '@sapphire/time-utilities'
 import { xxh32 } from '@node-rs/xxhash'
 import { prisma } from '../lib/prisma'
 import { ScheduledTask } from '@sapphire/plugin-scheduled-tasks'
 import { fetchFeed, formatFeed } from '../lib/serviceAdapters/feed'
 import { ApplyOptions } from '@sapphire/decorators'
+import { readFile } from 'fs/promises'
 
-import courses from '../../feeds'
+interface ConfigCourses {
+  contributors: string[];
+  channels: string[];
+  rssUrls: string[];
+}
 
-const INTERVAL = Time.Minute * 5;
+const checkInterval = process.env.INTERVAL ? parseInt(process.env.INTERVAL) : Time.Minute * 15;
 
 @ApplyOptions<ScheduledTask.Options>({
   name: 'feed-check',
-  interval: INTERVAL
+  interval: checkInterval
 })
 export class FeedCheckTask extends ScheduledTask {
+  private courses: ConfigCourses[] = [];
+
   async run(): Promise<void> {
     this.container.logger.info('FeedCheck: Running')
+    await this.refreshFeeds();
 
-    for (const [courseId, feeds] of Object.entries(courses)) {
+    for (const course of this.courses) {
       // TODO: Check if other channels are also subscribed to the same feeds
       // Note: This code is of poor quality and was written a day before semester starts
       // to get the bot borderline functioning enough to be used.
 
-      const contributors = feeds.map(feed => feed.contributor)
       const aggregatedAnnouncements = []
 
       // Combine feeds from all users
-      for (const feed of feeds) {
-        aggregatedAnnouncements.push(...formatFeed(await fetchFeed(feed.rssUrl)))
+      for (const rssUrl of course.rssUrls) {
+        aggregatedAnnouncements.push(...formatFeed(await fetchFeed(rssUrl)))
       }
 
       for (const announcement of aggregatedAnnouncements) {
         const hash = xxh32(announcement.rawContent).toString(16)
 
-        for (const channel of feed.channels) {
+        for (const channel of course.channels) {
           // Search Prisma for a broadcast with the same url and channelId
           const previousPosts = await prisma.broadcast.findMany({
             where: {
               url: announcement.link,
-              channelId: channel,
-              courseId
+              channelId: channel
             },
             orderBy: {
               createdAt: 'desc'
@@ -56,7 +63,7 @@ export class FeedCheckTask extends ScheduledTask {
             if (guildChannel == null || !guildChannel.isTextBased()) continue
 
             let newMessage
-            const messageContent = this.generateMessage(announcement, previousPosts, contributors)
+            const messageContent = this.generateMessage(announcement, previousPosts, course.contributors)
 
             // Try to reply to the previous message if there is a previous message
             let previousMessage, hasPreviousMessage = false;
@@ -77,7 +84,6 @@ export class FeedCheckTask extends ScheduledTask {
                 url: announcement.link,
                 channelId: channel,
                 messageId: newMessage.id,
-                courseId,
                 hash
               }
             })
@@ -93,12 +99,17 @@ export class FeedCheckTask extends ScheduledTask {
         }
       }
 
-      await new Promise(resolve => setTimeout(resolve, Math.floor(INTERVAL / Object.entries(courses).length)))
+      await new Promise(resolve => setTimeout(resolve, Math.floor(checkInterval / this.courses.length)))
     }
   }
 
-  generateMessage(announcement, previousPosts, contributors): MessagePayload | MessageCreateOptions {
-    const embed = {
+  async refreshFeeds(): Promise<void> {
+    const file = await readFile('./config/config.toml', 'utf-8');
+    this.courses = parse(file).feeds as unknown as ConfigCourses[];
+  }
+
+  generateMessage(announcement, previousPosts, contributors: String[]): MessagePayload | MessageCreateOptions {
+    const embed: APIEmbed = {
       title: announcement.title,
       url: announcement.link,
       color: 0x2694D7,
