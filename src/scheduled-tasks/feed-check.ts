@@ -14,7 +14,7 @@ interface ConfigCourses {
   rssUrls: string[];
 }
 
-const checkInterval = process.env.INTERVAL ? parseInt(process.env.INTERVAL) : Time.Minute * 15;
+const checkInterval = process.env.CHECK_INTERVAL ? parseInt(process.env.CHECK_INTERVAL) : Time.Minute * 15;
 
 @ApplyOptions<ScheduledTask.Options>({
   name: 'feed-check',
