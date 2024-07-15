@@ -12,8 +12,8 @@ services:
       - pg_data:/var/lib/postgresql/data
     healthcheck:
       test: pg_isready -U postgres
-      interval: 10s
-      timeout: 5s
+      interval: 20s
+      timeout: 10s
       retries: 5
 
   easel_redis:
