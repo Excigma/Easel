@@ -1,4 +1,4 @@
-import 'dotenv/config'
+// import 'dotenv/config'
 import '@sapphire/plugin-hmr/register'
 import '@sapphire/plugin-logger/register'
 import '@sapphire/plugin-subcommands/register'

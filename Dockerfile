@@ -14,12 +14,13 @@ RUN yarn set version stable
 # Install dependencies
 RUN yarn install --immutable
 
-# Copy the rest of the files and build the app
-COPY . /usr/app
+# Copy Prisma configuration and generate the client
+COPY prisma /usr/app
 RUN yarn pnpify prisma generate
-RUN yarn build
 
-# TODO: Only copy toml here to avoid rebuilding container
+# Copy the rest of the files and build the app
+COPY src tsconfig.json tsup.config.ts /usr/app
+RUN yarn build
 
 # Start the app
 USER node
