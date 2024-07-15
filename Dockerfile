@@ -7,7 +7,7 @@ RUN apk add --no-cache python3 make g++ tzdata
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone 
 
 # Copy package lists and install dependencies
-COPY package.json yarn.lock .yarnrc.yml /usr/app
+COPY .yarn package.json yarn.lock .yarnrc.yml /usr/app
 RUN yarn set version stable
 
 # Install dependencies
