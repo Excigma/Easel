@@ -59,19 +59,19 @@ export function sapphireOverrides(): void {
       label: '🗑️',
       type: ComponentType.Button,
       run: async ({ collector }) => {
-        collector.stop();
-
-        if (collector.channelId && collector.messageId) {
-          const channel = await collector.client.channels
-            .fetch(collector.channelId)
-            .catch(() => null);
-
-          if (channel && 'messages' in channel) {
-            // Try delete the message, but silently fail if unable
-            channel.messages.fetch(collector.messageId)
-              .then(message => message?.delete())
-              .catch(() => null);
+        try {
+          if (collector.channelId && collector.messageId) {
+            const channel = await collector.client.channels.fetch(collector.channelId);
+            if (channel && 'messages' in channel) {
+              // Try delete the message, but silently fail if unable
+              const message = await channel.messages.fetch(collector.messageId);
+              if (message && message.deletable) await message.delete()
+            }
+          } else {
+            throw new Error('Missing channel ID or message ID');
           }
+        } catch (error) {
+          collector.stop();
         }
       }
     }
