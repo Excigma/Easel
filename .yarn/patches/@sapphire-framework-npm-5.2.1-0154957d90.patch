@@ -1,0 +1,50 @@
+diff --git a/dist/cjs/preconditions/ClientPermissions.cjs b/dist/cjs/preconditions/ClientPermissions.cjs
+index ac575bf5922ac2c68d79db1bf7a22093c3b4128f..ebea1ea65baafbf6a4cd50f14a3c939374fa84f4 100644
+--- a/dist/cjs/preconditions/ClientPermissions.cjs
++++ b/dist/cjs/preconditions/ClientPermissions.cjs
+@@ -37,10 +37,16 @@ var _CorePrecondition = class _CorePrecondition extends Precondition_cjs.AllFlow
+     return this.sharedRun(required, permissions, "message");
+   }
+   async chatInputRun(interaction, _, context) {
+-    const required = context.permissions ?? new discord_js.PermissionsBitField();
+-    const channel = await this.fetchChannelFromInteraction(interaction);
+-    const permissions = await this.getPermissionsForChannel(channel, interaction);
+-    return this.sharedRun(required, permissions, "chat input");
++    try {
++      const required = context.permissions ?? new discord_js.PermissionsBitField();
++      const channel = await this.fetchChannelFromInteraction(interaction);
++      const permissions = await this.getPermissionsForChannel(channel, interaction);
++      return this.sharedRun(required, permissions, "chat input");
++    } catch (error) {
++      const required = context.permissions ?? new discord_js.PermissionsBitField();
++      const permissions = this.dmChannelPermissions;
++      return this.sharedRun(required, permissions, "chat input");
++    }
+   }
+   async contextMenuRun(interaction, _, context) {
+     const required = context.permissions ?? new discord_js.PermissionsBitField();
+diff --git a/dist/esm/preconditions/ClientPermissions.mjs b/dist/esm/preconditions/ClientPermissions.mjs
+index 7afca34d32c2f69eee5513643c9b1203646ade4c..1219a3d8b08824d676db4a9ca3b87131b75361e8 100644
+--- a/dist/esm/preconditions/ClientPermissions.mjs
++++ b/dist/esm/preconditions/ClientPermissions.mjs
+@@ -34,10 +34,16 @@ var _CorePrecondition = class _CorePrecondition extends AllFlowsPrecondition {
+     return this.sharedRun(required, permissions, "message");
+   }
+   async chatInputRun(interaction, _, context) {
+-    const required = context.permissions ?? new PermissionsBitField();
+-    const channel = await this.fetchChannelFromInteraction(interaction);
+-    const permissions = await this.getPermissionsForChannel(channel, interaction);
+-    return this.sharedRun(required, permissions, "chat input");
++    try {
++      const required = context.permissions ?? new discord_js.PermissionsBitField();
++      const channel = await this.fetchChannelFromInteraction(interaction);
++      const permissions = await this.getPermissionsForChannel(channel, interaction);
++      return this.sharedRun(required, permissions, "chat input");
++    } catch (error) {
++      const required = context.permissions ?? new discord_js.PermissionsBitField();
++      const permissions = this.dmChannelPermissions;
++      return this.sharedRun(required, permissions, "chat input");
++    }
+   }
+   async contextMenuRun(interaction, _, context) {
+     const required = context.permissions ?? new PermissionsBitField();
