@@ -1,4 +1,5 @@
 import { PaginatedMessage } from '@sapphire/discord.js-utilities'
+import { PartialGroupDMChannel } from 'discord.js'
 import { userMention, ComponentType, ButtonStyle } from 'discord.js'
 
 export function sapphireOverrides(): void {
@@ -9,7 +10,8 @@ export function sapphireOverrides(): void {
     {
       customId: '@sapphire/paginated-messages.goToPage',
       type: ComponentType.StringSelect,
-      run: ({ handler, interaction }) => interaction.isStringSelectMenu() && (handler.index = parseInt(interaction.values[0], 10))
+      options: [],
+      run: ({ handler, interaction }) => interaction.isStringSelectMenu() && (handler.index = parseInt(interaction.values[0], 10)),
     },
     {
       customId: '@sapphire/paginated-messages.firstPage',
@@ -54,10 +56,23 @@ export function sapphireOverrides(): void {
     {
       customId: '@sapphire/paginated-messages.stop',
       style: ButtonStyle.Danger,
-      label: 'Stop',
+      label: '🗑️',
       type: ComponentType.Button,
-      run: ({ collector }) => {
-        collector.stop()
+      run: async ({ collector }) => {
+        collector.stop();
+
+        if (collector.channelId && collector.messageId) {
+          const channel = await collector.client.channels
+            .fetch(collector.channelId)
+            .catch(() => null);
+
+          if (channel && 'messages' in channel) {
+            // Try delete the message, but silently fail if unable
+            channel.messages.fetch(collector.messageId)
+              .then(message => message?.delete())
+              .catch(() => null);
+          }
+        }
       }
     }
   ]

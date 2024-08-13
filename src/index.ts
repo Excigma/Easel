@@ -55,7 +55,7 @@ const client = new SapphireClient({
   }
 })
 
-sapphireOverrides()
+sapphireOverrides();
 
 client.login(process.env.DISCORD_TOKEN)
   .catch(error => {
