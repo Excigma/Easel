@@ -26,6 +26,7 @@ const client = new SapphireClient({
     enabled: !production
   },
   intents: [
+    GatewayIntentBits.DirectMessages,
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.GuildMessageReactions

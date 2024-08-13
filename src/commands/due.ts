@@ -4,7 +4,7 @@ import { Command } from '@sapphire/framework'
 import { fetchCalendar, formatCalendar } from '../lib/serviceAdapters/calendar'
 import { PaginatedMessage } from '@sapphire/discord.js-utilities'
 
-import { EmbedBuilder, PermissionFlagsBits } from 'discord.js'
+import { EmbedBuilder, PermissionFlagsBits, PartialGroupDMChannel } from 'discord.js'
 import { DATABASE_ACCESS_ERROR, strError, strWarn } from '../lib/constants'
 
 @ApplyOptions<Command.Options>({
@@ -45,20 +45,18 @@ export class DueCommand extends Command {
       await interaction.deferReply()
 
       const data = formatCalendar(await fetchCalendar(user.canvasCalendar.url))
-
-      const paginatedMessage = new PaginatedMessage({
-        template: new EmbedBuilder()
-          .setColor(0x2694D7)
-          .setAuthor({
-            name: interaction.user.username,
-            iconURL: interaction.user.displayAvatarURL()
-          })
-          .setTitle('Canvas Due Dates')
-          .setFooter({
-            iconURL: this.container.client.user?.displayAvatarURL(),
-            text: "Deadlines are from Canvas"
-          })
-      })
+      const template = new EmbedBuilder()
+        .setColor(0x2694D7)
+        .setAuthor({
+          name: interaction.user.username,
+          iconURL: interaction.user.displayAvatarURL()
+        })
+        .setTitle('Canvas Due Dates')
+        .setFooter({
+          iconURL: this.container.client.user?.displayAvatarURL(),
+          text: "Deadlines are from Canvas"
+        })
+      const paginatedMessage = new PaginatedMessage({ template })
 
       const PLACEHOLDER_TEXT = "*There may be issues with times returned from Canvas. Please check Canvas for the correct times.*\n\n"
       let page = PLACEHOLDER_TEXT
@@ -69,7 +67,7 @@ export class DueCommand extends Command {
         const eventText = `**${title}** - ${event.course}\n> due <t:${event.timestamp}:R> at <t:${event.timestamp}:F>\n\n`
 
         if (page.length + eventText.length > 1500) {
-          paginatedMessage.addPageEmbed((embed) => embed.setDescription(page))
+          paginatedMessage.addPageBuilder((builder) => builder.setEmbeds([new EmbedBuilder(template).setDescription(page)]));
           page = PLACEHOLDER_TEXT
         }
 
@@ -85,20 +83,17 @@ export class DueCommand extends Command {
         ].join('\n')
       }
 
-      paginatedMessage.addPageEmbed((embed) => embed.setDescription(page))
+      paginatedMessage.addPageBuilder((builder) => builder.setEmbeds([new EmbedBuilder(template).setDescription(page)]));
 
       // Sometimes channel is null - attempt to fetch the channel if it's null, otherwise
       // send an unpaginated response.
-      if (interaction.channel == null) {
+      if (!interaction.channel || interaction.channel.partial || interaction.channel instanceof PartialGroupDMChannel) {
         try {
           await this.container.client.channels.fetch(interaction.channelId)
         } catch (error) {
-          this.container.logger.error(error)
-
           // TODO: Proper error handling.
           // If missing access, then tell user that the bot needs to be re-invited
           // Attempt to send the first page if possible
-
           return interaction.editReply(paginatedMessage.pages[0]);
         }
       }
