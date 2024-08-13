@@ -46,26 +46,6 @@ export class DueCommand extends Command {
 
       const data = formatCalendar(await fetchCalendar(user.canvasCalendar.url))
 
-      // Sometimes channel is null - attempt to fetch the channel if it's null, otherwise
-      // send an unpaginated response.
-      if (interaction.channel == null) {
-        try {
-          await this.container.client.channels.fetch(interaction.channelId)
-        } catch (error) {
-          this.container.logger.error(error)
-
-          // TODO: Proper error handling.
-          // If missing access, then tell user that the bot needs to be re-invited
-
-          await (interaction.replied ? interaction.followUp : interaction.reply)({
-            content: strWarn('I do not have permission to view this channel. Permission to view this channel is required for pagination, and this command to work.'),
-            ephemeral: true
-          })
-
-          return
-        }
-      }
-
       const paginatedMessage = new PaginatedMessage({
         template: new EmbedBuilder()
           .setColor(0x2694D7)
@@ -106,6 +86,22 @@ export class DueCommand extends Command {
       }
 
       paginatedMessage.addPageEmbed((embed) => embed.setDescription(page))
+
+      // Sometimes channel is null - attempt to fetch the channel if it's null, otherwise
+      // send an unpaginated response.
+      if (interaction.channel == null) {
+        try {
+          await this.container.client.channels.fetch(interaction.channelId)
+        } catch (error) {
+          this.container.logger.error(error)
+
+          // TODO: Proper error handling.
+          // If missing access, then tell user that the bot needs to be re-invited
+          // Attempt to send the first page if possible
+
+          return interaction.editReply(paginatedMessage.pages[0]);
+        }
+      }
 
       await paginatedMessage.run(interaction)
     } catch (error) {
