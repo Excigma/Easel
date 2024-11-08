@@ -4,7 +4,7 @@ import { Command } from '@sapphire/framework'
 import { fetchCalendar, formatCalendar } from '../lib/serviceAdapters/calendar'
 import { PaginatedMessage } from '@sapphire/discord.js-utilities'
 
-import { EmbedBuilder, PermissionFlagsBits, PartialGroupDMChannel } from 'discord.js'
+import { EmbedBuilder, PermissionFlagsBits } from 'discord.js'
 import { DATABASE_ACCESS_ERROR, strError, strWarn } from '../lib/constants'
 
 @ApplyOptions<Command.Options>({
@@ -87,7 +87,7 @@ export class DueCommand extends Command {
 
       // Sometimes channel is null - attempt to fetch the channel if it's null, otherwise
       // send an unpaginated response.
-      if (!interaction.channel || interaction.channel.partial || interaction.channel instanceof PartialGroupDMChannel) {
+      if (interaction.channel == null) {
         try {
           await this.container.client.channels.fetch(interaction.channelId)
         } catch (error) {
