@@ -77,9 +77,9 @@ export class DueCommand extends Command {
       // Add a placeholder warning if there are no due dates
       if (data.length === 0) {
         page = [
-          'It appears that there are no upcoming due dates at this time. It may be a good opportunity to touch grass now.',
+          'It appears that there are no upcoming due dates at this time. It may be a good opportunity to inhale some fresh air and touch some grass.',
           '',
-          'However, we recommend checking your [calendar on Canvas](https://canvas.auckland.ac.nz/calendar) to confirm this and to check other platforms for any additional deadlines.'
+          'However, we recommend checking your [calendar on Canvas](https://canvas.auckland.ac.nz/calendar) and other platforms for any additional deadlines..'
         ].join('\n')
       }
 
