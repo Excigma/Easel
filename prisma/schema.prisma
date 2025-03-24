@@ -14,7 +14,8 @@ datasource db {
 model User {
   id String @id @unique
 
-  canvasCalendar CanvasCalendar?
+  canvasCalendar    CanvasCalendar?
+  canvasCalendarBlocklist String[]
 }
 
 model CanvasCalendar {
