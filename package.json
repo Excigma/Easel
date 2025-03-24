@@ -6,7 +6,7 @@
   "repository": "https://github.com/Excigma/Easel.git",
   "author": "@excigma",
   "license": "MIT",
-  "packageManager": "yarn@4.5.1",
+  "packageManager": "yarn@4.7.0",
   "type": "module",
   "devDependencies": {
     "@sapphire/ts-config": "^5.0.1",
