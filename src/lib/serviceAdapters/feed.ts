@@ -19,7 +19,7 @@ export const fetchFeed = async (url: string): Promise<any> => {
 }
 
 export const formatFeed = (data: any[]): any[] => {
-  if (!data.entry) data.entry = []
+  if (!data || !data.entry) return []
   if (!Array.isArray(data.entry)) data.entry = [data.entry]
 
   // Reverse order of announcements
