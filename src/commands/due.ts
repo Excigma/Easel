@@ -1,95 +1,110 @@
-import { ApplyOptions } from '@sapphire/decorators'
-import { prisma } from '../lib/prisma'
-import { Command } from '@sapphire/framework'
-import { fetchCalendar, formatCalendar } from '../lib/serviceAdapters/calendar'
-import { PaginatedMessage } from '@sapphire/discord.js-utilities'
+import { ApplyOptions } from "@sapphire/decorators";
+import { prisma } from "../lib/prisma";
+import { Command } from "@sapphire/framework";
+import { fetchCalendar, formatCalendar } from "../lib/serviceAdapters/calendar";
+import { PaginatedMessage } from "@sapphire/discord.js-utilities";
 
-import { EmbedBuilder, PermissionFlagsBits } from 'discord.js'
-import { DATABASE_ACCESS_ERROR, strError, strWarn } from '../lib/constants'
+import { EmbedBuilder, PermissionFlagsBits } from "discord.js";
+import { DATABASE_ACCESS_ERROR, strError, strWarn } from "../lib/constants";
 
 @ApplyOptions<Command.Options>({
-  name: 'due',
-  description: 'Check upcoming deadlines that are set on Canvas',
-  requiredClientPermissions: [PermissionFlagsBits.EmbedLinks]
+  name: "due",
+  description: "Check upcoming deadlines that are set on Canvas",
+  requiredClientPermissions: [PermissionFlagsBits.EmbedLinks],
 })
 export class DueCommand extends Command {
-  public override registerApplicationCommands(registry: Command.Registry): void {
+  public override registerApplicationCommands(
+    registry: Command.Registry,
+  ): void {
     // Register Chat Input command
     registry.registerChatInputCommand({
       name: this.name,
-      description: this.description
+      description: this.description,
     });
   }
 
-  public async chatInputRun(interaction: Command.ChatInputCommandInteraction): Promise<void> {
+  public async chatInputRun(
+    interaction: Command.ChatInputCommandInteraction,
+  ): Promise<void> {
     try {
       // Check if the user has their canvasICalendar relational field set
       const user = await prisma.user.findUnique({
         where: {
-          id: interaction.user.id
+          id: interaction.user.id,
         },
         select: {
-          canvasCalendar: true
-        }
-      })
+          canvasCalendar: true,
+        },
+      });
 
-      if ((user?.canvasCalendar) == null) {
+      if (user?.canvasCalendar == null) {
         await interaction.reply({
-          content: strWarn('It seems that your Canvas calendar URL has not been linked yet. The `/due` command needs to access your Canvas calendar to retrieve due dates. You can link your calendar URL using the `/link calendar` command'),
-          ephemeral: true
-        })
+          content: strWarn(
+            "It seems that your Canvas calendar URL has not been linked yet. The `/due` command needs to access your Canvas calendar to retrieve due dates. You can link your calendar URL using the `/link calendar` command",
+          ),
+          ephemeral: true,
+        });
 
-        return
+        return;
       }
 
-      await interaction.deferReply()
+      await interaction.deferReply();
 
-      const data = formatCalendar(await fetchCalendar(user.canvasCalendar.url))
+      const data = formatCalendar(await fetchCalendar(user.canvasCalendar.url));
       const template = new EmbedBuilder()
-        .setColor(0x2694D7)
+        .setColor(0x2694d7)
         .setAuthor({
           name: interaction.user.username,
-          iconURL: interaction.user.displayAvatarURL()
+          iconURL: interaction.user.displayAvatarURL(),
         })
-        .setTitle('Canvas Due Dates')
+        .setTitle("Canvas Due Dates")
         .setFooter({
           iconURL: this.container.client.user?.displayAvatarURL(),
-          text: "Deadlines are from Canvas"
-        })
-      const paginatedMessage = new PaginatedMessage({ template })
+          text: "Deadlines are from Canvas",
+        });
+      const paginatedMessage = new PaginatedMessage({ template });
 
-      const PLACEHOLDER_TEXT = "*There may be issues with times returned from Canvas. Please check Canvas for the correct times.*\n\n"
-      let page = PLACEHOLDER_TEXT
+      const PLACEHOLDER_TEXT =
+        "*There may be issues with times returned from Canvas. Please check Canvas for the correct times.*\n\n";
+      let page = PLACEHOLDER_TEXT;
 
       // Split due dates up into pages
       for (const event of data) {
-        const title = event.url ? `[${event.title}](${event.url})` : event.title
-        const eventText = `**${title}** - ${event.course}\n> due <t:${event.timestamp}:R> at <t:${event.timestamp}:F>\n\n`
+        const title = event.url
+          ? `[${event.title}](${event.url})`
+          : event.title;
+        const eventText = `**${title}** - ${event.course}\n> due <t:${event.timestamp}:R> at <t:${event.timestamp}:F>\n\n`;
 
         if (page.length + eventText.length > 1500) {
-          paginatedMessage.addPageBuilder((builder) => builder.setEmbeds([new EmbedBuilder(template).setDescription(page)]));
-          page = PLACEHOLDER_TEXT
+          paginatedMessage.addPageBuilder((builder) =>
+            builder.setEmbeds([
+              new EmbedBuilder(template).setDescription(page),
+            ]),
+          );
+          page = PLACEHOLDER_TEXT;
         }
 
-        page += eventText
+        page += eventText;
       }
 
       // Add a placeholder warning if there are no due dates
       if (data.length === 0) {
         page = [
-          'It appears that there are no upcoming due dates at this time. It may be a good opportunity to inhale some fresh air and touch some grass.',
-          '',
-          'However, we recommend checking your [calendar on Canvas](https://canvas.auckland.ac.nz/calendar) and other platforms for any additional deadlines..'
-        ].join('\n')
+          "It appears that there are no upcoming due dates at this time. It may be a good opportunity to inhale some fresh air and touch some grass.",
+          "",
+          "However, we recommend checking your [calendar on Canvas](https://canvas.auckland.ac.nz/calendar) and other platforms for any additional deadlines..",
+        ].join("\n");
       }
 
-      paginatedMessage.addPageBuilder((builder) => builder.setEmbeds([new EmbedBuilder(template).setDescription(page)]));
+      paginatedMessage.addPageBuilder((builder) =>
+        builder.setEmbeds([new EmbedBuilder(template).setDescription(page)]),
+      );
 
       // Sometimes channel is null - attempt to fetch the channel if it's null, otherwise
       // send an unpaginated response.
       if (interaction.channel == null) {
         try {
-          await this.container.client.channels.fetch(interaction.channelId)
+          await this.container.client.channels.fetch(interaction.channelId);
         } catch (error) {
           // TODO: Proper error handling.
           // If missing access, then tell user that the bot needs to be re-invited
@@ -98,14 +113,14 @@ export class DueCommand extends Command {
         }
       }
 
-      await paginatedMessage.run(interaction)
+      await paginatedMessage.run(interaction);
     } catch (error) {
-      this.container.logger.error(error)
+      this.container.logger.error(error);
 
       await (interaction.replied ? interaction.followUp : interaction.reply)({
         content: strError(DATABASE_ACCESS_ERROR),
-        ephemeral: true
-      })
+        ephemeral: true,
+      });
     }
   }
 }

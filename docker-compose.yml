@@ -3,7 +3,7 @@ services:
     image: postgres:16-alpine
     restart: always
     ports:
-      - '5432:5432'
+      - "5432:5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -20,7 +20,7 @@ services:
     image: redis:alpine
     restart: always
     ports:
-      - '6379:6379'
+      - "6379:6379"
     healthcheck:
       test: redis-cli ping | grep PONG
       interval: 10s
@@ -41,8 +41,8 @@ services:
     volumes:
       - ./config:/usr/app/config
     depends_on:
-      - 'easel_postgres'
-      - 'easel_redis'
+      - "easel_postgres"
+      - "easel_redis"
 
 volumes:
   pg_data:

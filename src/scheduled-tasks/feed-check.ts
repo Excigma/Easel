@@ -1,12 +1,18 @@
-import { Message, MessagePayload, APIEmbed, type MessageEditOptions, type MessageCreateOptions } from 'discord.js'
-import { parse } from 'smol-toml'
-import { Time } from '@sapphire/time-utilities'
-import { xxh32 } from '@node-rs/xxhash'
-import { prisma } from '../lib/prisma'
-import { ScheduledTask } from '@sapphire/plugin-scheduled-tasks'
-import { fetchFeed, formatFeed } from '../lib/serviceAdapters/feed'
-import { ApplyOptions } from '@sapphire/decorators'
-import { readFile } from 'fs/promises'
+import {
+  Message,
+  MessagePayload,
+  APIEmbed,
+  type MessageEditOptions,
+  type MessageCreateOptions,
+} from "discord.js";
+import { parse } from "smol-toml";
+import { Time } from "@sapphire/time-utilities";
+import { xxh32 } from "@node-rs/xxhash";
+import { prisma } from "../lib/prisma";
+import { ScheduledTask } from "@sapphire/plugin-scheduled-tasks";
+import { fetchFeed, formatFeed } from "../lib/serviceAdapters/feed";
+import { ApplyOptions } from "@sapphire/decorators";
+import { readFile } from "fs/promises";
 
 interface ConfigCourses {
   contributors: string[];
@@ -14,17 +20,19 @@ interface ConfigCourses {
   rssUrls: string[];
 }
 
-const checkInterval = process.env.ANNOUNCEMENT_CHECK_INTERVAL ? parseInt(process.env.ANNOUNCEMENT_CHECK_INTERVAL) : Time.Minute * 15;
+const checkInterval = process.env.ANNOUNCEMENT_CHECK_INTERVAL
+  ? parseInt(process.env.ANNOUNCEMENT_CHECK_INTERVAL)
+  : Time.Minute * 15;
 
 @ApplyOptions<ScheduledTask.Options>({
-  name: 'feed-check',
-  interval: checkInterval
+  name: "feed-check",
+  interval: checkInterval,
 })
 export class FeedCheckTask extends ScheduledTask {
   private courses: ConfigCourses[] = [];
 
   async run(): Promise<void> {
-    this.container.logger.info('FeedCheck: Running')
+    this.container.logger.info("FeedCheck: Running");
     await this.refreshFeeds();
 
     for (const course of this.courses) {
@@ -32,45 +40,59 @@ export class FeedCheckTask extends ScheduledTask {
       // Note: This code is of poor quality and was written a day before semester starts
       // to get the bot borderline functioning enough to be used.
 
-      const aggregatedAnnouncements = []
+      const aggregatedAnnouncements = [];
 
       // Combine feeds from all users
       for (const rssUrl of course.rssUrls) {
-        aggregatedAnnouncements.push(...formatFeed(await fetchFeed(rssUrl)))
+        aggregatedAnnouncements.push(...formatFeed(await fetchFeed(rssUrl)));
       }
 
       for (const announcement of aggregatedAnnouncements) {
-        const hash = xxh32(announcement.rawContent).toString(16)
+        const hash = xxh32(announcement.rawContent).toString(16);
 
         for (const channel of course.channels) {
           // Search Prisma for a broadcast with the same url and channelId
           const previousPosts = await prisma.broadcast.findMany({
             where: {
               url: announcement.link,
-              channelId: channel
+              channelId: channel,
             },
             orderBy: {
-              createdAt: 'desc'
-            }
-          })
+              createdAt: "desc",
+            },
+          });
 
           // Check if the announcement has already been posted
-          if ((previousPosts.length > 0) && previousPosts.some(post => post.hash === hash)) continue
+          if (
+            previousPosts.length > 0 &&
+            previousPosts.some((post) => post.hash === hash)
+          )
+            continue;
 
           try {
-            const guildChannel = await this.container.client.channels.fetch(channel)
+            const guildChannel =
+              await this.container.client.channels.fetch(channel);
 
-            if (guildChannel == null || !guildChannel.isTextBased()) continue
+            if (guildChannel == null || !guildChannel.isTextBased()) continue;
 
-            let newMessage
-            const messageContent = this.generateMessage(announcement, previousPosts, course.contributors)
+            let newMessage;
+            const messageContent = this.generateMessage(
+              announcement,
+              previousPosts,
+              course.contributors,
+            );
 
             // Try to reply to the previous message if there is a previous message
-            let previousMessage, hasPreviousMessage = false;
+            let previousMessage,
+              hasPreviousMessage = false;
             if (previousPosts.length > 0) {
-              previousMessage = await guildChannel.messages.fetch(previousPosts[0].messageId).catch(_ => { return null; })
+              previousMessage = await guildChannel.messages
+                .fetch(previousPosts[0].messageId)
+                .catch((_) => {
+                  return null;
+                });
 
-              hasPreviousMessage = (previousMessage !== null);
+              hasPreviousMessage = previousMessage !== null;
             }
 
             if (hasPreviousMessage) {
@@ -84,76 +106,91 @@ export class FeedCheckTask extends ScheduledTask {
                 url: announcement.link,
                 channelId: channel,
                 messageId: newMessage.id,
-                hash
-              }
-            })
+                hash,
+              },
+            });
 
             for (const post of previousPosts) {
-              const previousMessage = await guildChannel.messages.fetch(post.messageId)
-              await previousMessage.edit(this.generateEditMessage(newMessage, previousMessage))
+              const previousMessage = await guildChannel.messages.fetch(
+                post.messageId,
+              );
+              await previousMessage.edit(
+                this.generateEditMessage(newMessage, previousMessage),
+              );
             }
           } catch (error) {
-            this.container.logger.error(`FeedCheck: Error while sending message to channel ${channel}`)
-            this.container.logger.error(error)
+            this.container.logger.error(
+              `FeedCheck: Error while sending message to channel ${channel}`,
+            );
+            this.container.logger.error(error);
           }
         }
       }
 
-      await new Promise(resolve => setTimeout(resolve, Math.floor(checkInterval / this.courses.length)))
+      await new Promise((resolve) =>
+        setTimeout(resolve, Math.floor(checkInterval / this.courses.length)),
+      );
     }
   }
 
   async refreshFeeds(): Promise<void> {
-    const file = await readFile('./config/config.toml', 'utf-8');
+    const file = await readFile("./config/config.toml", "utf-8");
     this.courses = parse(file).feeds as unknown as ConfigCourses[];
   }
 
-  generateMessage(announcement, previousPosts, contributors: String[]): MessagePayload | MessageCreateOptions {
+  generateMessage(
+    announcement,
+    previousPosts,
+    contributors: String[],
+  ): MessagePayload | MessageCreateOptions {
     const embed: APIEmbed = {
       title: announcement.title,
       url: announcement.link,
-      color: 0x2694D7,
+      color: 0x2694d7,
       description: announcement.content,
       footer: {
-        text: `Contributed via ${contributors.join(", ")}'s Canvas`
+        text: `Contributed via ${contributors.join(", ")}'s Canvas`,
       },
-    }
+    };
 
     // Check if there is an author name or profile picture, if there is then add it to the embed
     if (announcement?.author?.name) {
-      embed.author = { name: announcement.author.name }
+      embed.author = { name: announcement.author.name };
     }
 
     // created_at is the time when the announcement was written, but not posted yet
     // posted_at is the scheduled time that the announcement should be posted
     if (announcement.updated || announcement.published) {
-      embed.timestamp = announcement.updated || announcement.published
+      embed.timestamp = announcement.updated || announcement.published;
     }
 
     const messageContentHeader = previousPosts.length
-      ? '⚠️ A previous announcement was edited'
-      : 'A new announcement was posted to Canvas'
+      ? "⚠️ A previous announcement was edited"
+      : "A new announcement was posted to Canvas";
 
-    const messageContent = `**${messageContentHeader}** <t:${Date.parse(announcement.updated || announcement.published) / 1000}:R>: [${announcement.title || ''}](${announcement.link})`
+    const messageContent = `**${messageContentHeader}** <t:${Date.parse(announcement.updated || announcement.published) / 1000}:R>: [${announcement.title || ""}](${announcement.link})`;
 
     return {
       content: messageContent,
-      embeds: [embed]
-    }
+      embeds: [embed],
+    };
   }
 
-  generateEditMessage(newMessage: Message, previousMessage: Message): MessagePayload | MessageEditOptions {
-    let newContent = `🛑 This announcement has been edited. See latest version at: ${newMessage.url}\n\n`
+  generateEditMessage(
+    newMessage: Message,
+    previousMessage: Message,
+  ): MessagePayload | MessageEditOptions {
+    let newContent = `🛑 This announcement has been edited. See latest version at: ${newMessage.url}\n\n`;
 
-    if (!previousMessage.content.includes('🛑')) {
-      newContent += '🛑 The contents of this message are now __outdated__.\n'
+    if (!previousMessage.content.includes("🛑")) {
+      newContent += "🛑 The contents of this message are now __outdated__.\n";
     }
 
-    newContent += previousMessage.content
+    newContent += previousMessage.content;
 
     return {
       content: newContent,
-      embeds: previousMessage.embeds
-    }
+      embeds: previousMessage.embeds,
+    };
   }
 }

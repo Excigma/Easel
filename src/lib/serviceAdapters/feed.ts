@@ -1,41 +1,44 @@
-import { extract } from '@extractus/feed-extractor'
-import { truncateMarkdown, HTMLtoDiscordMarkdown } from '../utils'
+import { extract } from "@extractus/feed-extractor";
+import { truncateMarkdown, HTMLtoDiscordMarkdown } from "../utils";
 
-const FEED_REGEX = /^https:\/\/canvas\.auckland\.ac\.nz\/feeds\/announcements\/(enrollment_|group_membership_)[a-zA-Z0-9]+\.atom$/
+const FEED_REGEX =
+  /^https:\/\/canvas\.auckland\.ac\.nz\/feeds\/announcements\/(enrollment_|group_membership_)[a-zA-Z0-9]+\.atom$/;
 
-export const validateFeedUrl = (url: string): boolean => FEED_REGEX.test(url)
+export const validateFeedUrl = (url: string): boolean => FEED_REGEX.test(url);
 
 export const fetchFeed = async (url: string): Promise<any> => {
   if (!validateFeedUrl(url)) {
-    throw new Error('Invalid Canvas calendar URL')
+    throw new Error("Invalid Canvas calendar URL");
   }
 
   const feed = await extract(url, {
     descriptionMaxLen: 9999,
-    normalization: false
-  })
+    normalization: false,
+  });
 
-  return feed
-}
+  return feed;
+};
 
 export const formatFeed = (data: any[]): any[] => {
-  if (!data || !data.entry) return []
-  if (!Array.isArray(data.entry)) data.entry = [data.entry]
+  if (!data || !data.entry) return [];
+  if (!Array.isArray(data.entry)) data.entry = [data.entry];
 
   // Reverse order of announcements
   // data.entry.reverse();
 
   // Limit to 5 entries announcements to limit abuse by subscribing to a course with a lot of announcements
-  data.entry.length = Math.min(data.entry.length, 5)
+  data.entry.length = Math.min(data.entry.length, 5);
 
   // Reverse order of announcements so oldest is first
   data.entry.reverse();
   return data.entry.map((entry: any) => {
     const content = truncateMarkdown(
-      HTMLtoDiscordMarkdown(entry.content || "This announcement doesn't have any content")
-    )
-    const title = entry.title || 'Untitled announcement'
+      HTMLtoDiscordMarkdown(
+        entry.content || "This announcement doesn't have any content",
+      ),
+    );
+    const title = entry.title || "Untitled announcement";
 
-    return { ...entry, content, rawContent: entry.content, title }
-  })
-}
+    return { ...entry, content, rawContent: entry.content, title };
+  });
+};

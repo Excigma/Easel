@@ -1,79 +1,84 @@
-import { PaginatedMessage } from '@sapphire/discord.js-utilities'
-import { PartialGroupDMChannel } from 'discord.js'
-import { userMention, ComponentType, ButtonStyle } from 'discord.js'
+import { PaginatedMessage } from "@sapphire/discord.js-utilities";
+import { PartialGroupDMChannel } from "discord.js";
+import { userMention, ComponentType, ButtonStyle } from "discord.js";
 
 export function sapphireOverrides(): void {
-  PaginatedMessage.wrongUserInteractionReply = (targetUser) => `This message is for ${userMention(targetUser.id)}. Please run the command yourself to use pagination.`
-  PaginatedMessage.embedFooterSeparator = ' | '
-  PaginatedMessage.pageIndexPrefix = 'Page'
+  PaginatedMessage.wrongUserInteractionReply = (targetUser) =>
+    `This message is for ${userMention(targetUser.id)}. Please run the command yourself to use pagination.`;
+  PaginatedMessage.embedFooterSeparator = " | ";
+  PaginatedMessage.pageIndexPrefix = "Page";
   PaginatedMessage.defaultActions = [
     {
-      customId: '@sapphire/paginated-messages.goToPage',
+      customId: "@sapphire/paginated-messages.goToPage",
       type: ComponentType.StringSelect,
       options: [],
-      run: ({ handler, interaction }) => interaction.isStringSelectMenu() && (handler.index = parseInt(interaction.values[0], 10)),
+      run: ({ handler, interaction }) =>
+        interaction.isStringSelectMenu() &&
+        (handler.index = parseInt(interaction.values[0], 10)),
     },
     {
-      customId: '@sapphire/paginated-messages.firstPage',
+      customId: "@sapphire/paginated-messages.firstPage",
       style: ButtonStyle.Primary,
-      label: '<<',
+      label: "<<",
       type: ComponentType.Button,
-      run: ({ handler }) => (handler.index = 0)
+      run: ({ handler }) => (handler.index = 0),
     },
     {
-      customId: '@sapphire/paginated-messages.previousPage',
+      customId: "@sapphire/paginated-messages.previousPage",
       style: ButtonStyle.Primary,
-      label: '<',
+      label: "<",
       type: ComponentType.Button,
       run: ({ handler }) => {
         if (handler.index === 0) {
-          handler.index = handler.pages.length - 1
+          handler.index = handler.pages.length - 1;
         } else {
-          --handler.index
+          --handler.index;
         }
-      }
+      },
     },
     {
-      customId: '@sapphire/paginated-messages.nextPage',
+      customId: "@sapphire/paginated-messages.nextPage",
       style: ButtonStyle.Primary,
-      label: '>',
+      label: ">",
       type: ComponentType.Button,
       run: ({ handler }) => {
         if (handler.index === handler.pages.length - 1) {
-          handler.index = 0
+          handler.index = 0;
         } else {
-          ++handler.index
+          ++handler.index;
         }
-      }
+      },
     },
     {
-      customId: '@sapphire/paginated-messages.goToLastPage',
+      customId: "@sapphire/paginated-messages.goToLastPage",
       style: ButtonStyle.Primary,
-      label: '>>',
+      label: ">>",
       type: ComponentType.Button,
-      run: ({ handler }) => (handler.index = handler.pages.length - 1)
+      run: ({ handler }) => (handler.index = handler.pages.length - 1),
     },
     {
-      customId: '@sapphire/paginated-messages.stop',
+      customId: "@sapphire/paginated-messages.stop",
       style: ButtonStyle.Danger,
-      label: '🗑️',
+      label: "🗑️",
       type: ComponentType.Button,
       run: async ({ collector }) => {
         try {
           if (collector.channelId && collector.messageId) {
-            const channel = await collector.client.channels.fetch(collector.channelId);
-            if (channel && 'messages' in channel) {
+            const channel = await collector.client.channels.fetch(
+              collector.channelId,
+            );
+            if (channel && "messages" in channel) {
               // Try delete the message, but silently fail if unable
               const message = await channel.messages.fetch(collector.messageId);
-              if (message && message.deletable) await message.delete()
+              if (message && message.deletable) await message.delete();
             }
           } else {
-            throw new Error('Missing channel ID or message ID');
+            throw new Error("Missing channel ID or message ID");
           }
         } catch (error) {
           collector.stop();
         }
-      }
-    }
-  ]
+      },
+    },
+  ];
 }

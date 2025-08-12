@@ -5,9 +5,7 @@
   },
   "eslint.nodePath": ".yarn/sdks",
   "standard.autoFixOnSave": true,
-  "cSpell.words": [
-    "Panopto"
-  ],
+  "cSpell.words": ["Panopto"],
   "standard.enableGlobally": true,
   "standard.engine": "ts-standard",
   "typescript.tsdk": ".yarn/sdks/typescript/lib",
