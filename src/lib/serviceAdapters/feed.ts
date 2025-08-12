@@ -1,7 +1,7 @@
 import { extract } from '@extractus/feed-extractor'
 import { truncateMarkdown, HTMLtoDiscordMarkdown } from '../utils'
 
-const FEED_REGEX = /^https:\/\/canvas\.auckland\.ac\.nz\/feeds\/announcements\/enrollment_[a-zA-Z0-9]+\.atom$/
+const FEED_REGEX = /^https:\/\/canvas\.auckland\.ac\.nz\/feeds\/announcements\/(enrollment_|group_membership_)[a-zA-Z0-9]+\.atom$/
 
 export const validateFeedUrl = (url: string): boolean => FEED_REGEX.test(url)
 
