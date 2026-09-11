@@ -6,6 +6,16 @@ import {
   validateCanvasTokenUrl,
 } from "./canvas";
 
+export interface Announcement {
+  author?: { name?: string };
+  content: string;
+  link: string;
+  published?: string;
+  rawContent: string;
+  title: string;
+  updated?: string;
+}
+
 export const validateFeedUrl = (url: string): boolean =>
   validateCanvasTokenUrl(url, "/feeds/announcements/enrollment_", ".atom") ||
   validateCanvasTokenUrl(
@@ -30,7 +40,7 @@ export const fetchFeed = async (url: string): Promise<any> => {
   }
 };
 
-export const formatFeed = (data: any[]): any[] => {
+export const formatFeed = (data: any): Announcement[] => {
   if (!data || !data.entry) return [];
   if (!Array.isArray(data.entry)) data.entry = [data.entry];
 
@@ -43,13 +53,11 @@ export const formatFeed = (data: any[]): any[] => {
   // Reverse order of announcements so oldest is first
   data.entry.reverse();
   return data.entry.map((entry: any) => {
-    const content = truncateMarkdown(
-      HTMLtoDiscordMarkdown(
-        entry.content || "This announcement doesn't have any content",
-      ),
-    );
+    const rawContent =
+      entry.content || "This announcement doesn't have any content";
+    const content = truncateMarkdown(HTMLtoDiscordMarkdown(rawContent));
     const title = entry.title || "Untitled announcement";
 
-    return { ...entry, content, rawContent: entry.content, title };
+    return { ...entry, content, rawContent, title };
   });
 };
