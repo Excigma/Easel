@@ -1,22 +1,33 @@
-import { extract } from "@extractus/feed-extractor";
+import { extractFromXml } from "@extractus/feed-extractor";
 import { truncateMarkdown, HTMLtoDiscordMarkdown } from "../utils";
+import {
+  CanvasRateLimitError,
+  fetchCanvasText,
+  validateCanvasTokenUrl,
+} from "./canvas";
 
-const FEED_REGEX =
-  /^https:\/\/canvas\.auckland\.ac\.nz\/feeds\/announcements\/(enrollment_|group_membership_)[a-zA-Z0-9]+\.atom$/;
-
-export const validateFeedUrl = (url: string): boolean => FEED_REGEX.test(url);
+export const validateFeedUrl = (url: string): boolean =>
+  validateCanvasTokenUrl(url, "/feeds/announcements/enrollment_", ".atom") ||
+  validateCanvasTokenUrl(
+    url,
+    "/feeds/announcements/group_membership_",
+    ".atom",
+  );
 
 export const fetchFeed = async (url: string): Promise<any> => {
   if (!validateFeedUrl(url)) {
-    throw new Error("Invalid Canvas calendar URL");
+    throw new Error("Invalid Canvas announcement feed URL");
   }
 
-  const feed = await extract(url, {
-    descriptionMaxLen: 9999,
-    normalization: false,
-  });
-
-  return feed;
+  try {
+    return extractFromXml(await fetchCanvasText(url, false), {
+      descriptionMaxLen: 9999,
+      normalization: false,
+    });
+  } catch (error) {
+    if (error instanceof CanvasRateLimitError) return null;
+    throw error;
+  }
 };
 
 export const formatFeed = (data: any[]): any[] => {

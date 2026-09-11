@@ -1,22 +1,19 @@
 import icalRoot from "node-ical";
 import { Time } from "@sapphire/time-utilities";
+import { fetchCanvasText, validateCanvasTokenUrl } from "./canvas";
 
 const ical = icalRoot.async;
 
 const COURSE_MATCH = / \[([A-Z0-9 /]+)\]$/;
-const CALENDAR_REGEX =
-  /^https:\/\/canvas\.auckland\.ac\.nz\/feeds\/calendars\/user_[a-zA-Z0-9]+\.ics$/;
-
 export const validateCalendarUrl = (url: string): boolean =>
-  CALENDAR_REGEX.test(url);
+  validateCanvasTokenUrl(url, "/feeds/calendars/user_", ".ics");
 
 export const fetchCalendar = async (url: string): Promise<any> => {
   if (!validateCalendarUrl(url)) {
     throw new Error("Invalid Canvas calendar URL");
   }
 
-  const events = await ical.fromURL(url);
-  return events;
+  return ical.parseICS(await fetchCanvasText(url));
 };
 
 export const formatCalendar = (data: any): any[] => {
