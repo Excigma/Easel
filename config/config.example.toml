@@ -1,5 +1,7 @@
 # Example course
 [[feeds]]
+# Course code shown in the announcement embed
+courseCode = "EXAMPLE 101"
 # Name to show in embed footer of the announcement
 contributors = ["Contributor name"]
 # Discord channel IDs to send the announcements to
@@ -12,6 +14,7 @@ rssUrls = [
 
 # Example course 2
 [[feeds]]
+courseCode = "EXAMPLE 102"
 contributors = ["Excigma"]
 channels = [
 	# Channel One

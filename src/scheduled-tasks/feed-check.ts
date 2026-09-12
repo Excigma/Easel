@@ -21,6 +21,7 @@ interface ConfigCourses {
   contributors: string[];
   channels: string[];
   rssUrls: string[];
+  courseCode?: string;
 }
 
 const DISCORD_MESSAGE_LIMIT = 2_000;
@@ -94,6 +95,7 @@ export class FeedCheckTask extends ScheduledTask {
               previousPosts.length > 0,
               previousMessage,
               course.contributors,
+              course.courseCode,
             );
             const newMessage = previousMessage
               ? await previousMessage.reply(messageContent)
@@ -149,7 +151,9 @@ function generateAnnouncementMessage(
   edited: boolean,
   previousMessage: Message | null,
   contributors: string[],
+  courseCode?: string,
 ): MessageCreateOptions {
+  const displayCourseCode = courseCode?.trim();
   const timestampValue = announcement.updated ?? announcement.published;
   const timestamp = timestampValue ? Date.parse(timestampValue) : NaN;
   const timestampSeconds = Number.isFinite(timestamp)
@@ -176,9 +180,11 @@ function generateAnnouncementMessage(
   );
 
   const embed: APIEmbed = {
-    title: announcement.title,
+    title: displayCourseCode ?? "Announcement",
     url: announcement.link,
-    color: 0x2694d7,
+    color: displayCourseCode
+      ? courseEmbedColor(announcement.link)
+      : 0x2694d7,
     description: announcement.content,
     footer: {
       text: `Contributed via ${contributors.join(", ")}'s Canvas`,
@@ -387,4 +393,26 @@ function truncateCharacters(value: string, limit: number): string {
 
 function characterCount(value: string): number {
   return [...value].length;
+}
+
+function courseEmbedColor(link: string): number {
+  let seed = link;
+
+  try {
+    const url = new URL(link);
+    const coursePath = url.pathname.match(/^\/courses\/[^/]+/)?.[0];
+
+    if (coursePath) {
+      seed = `${url.origin}${coursePath}`;
+    }
+  } catch {
+    // Fall back to the original link if it is not a valid URL.
+  }
+
+  const hash = Number(xxh32(seed));
+  const red = 96 + (hash & 0x7f);
+  const green = 96 + ((hash >>> 8) & 0x7f);
+  const blue = 96 + ((hash >>> 16) & 0x7f);
+
+  return (red << 16) | (green << 8) | blue;
 }
